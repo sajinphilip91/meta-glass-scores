@@ -237,11 +237,21 @@ async function loadCricket() {
 }
 
 function isIPLorInternational(m) {
-  const name = (m.name || '').toLowerCase();
   const type = (m.matchType || '').toLowerCase();
-  const isIPL = name.includes('ipl') || name.includes('indian premier league');
-  const isInternational = name.includes('t20i') || name.includes(' odi') || type === 'test' || name.includes(' test');
-  return isIPL || isInternational;
+  const teams = m.teams || [];
+  const t1 = (teams[0] || '').toLowerCase();
+  const t2 = (teams[1] || '').toLowerCase();
+
+  // IPL: either team is a known IPL franchise
+  const isIPL = !!(IPL_TEAMS[t1] || IPL_TEAMS[t2]);
+
+  // International ODI or Test are always international
+  const isOdiOrTest = type === 'odi' || type === 'test';
+
+  // T20I: matchType is t20i, or it's a t20 between two national teams
+  const isIntlT20 = type === 't20i' || (type === 't20' && !!(COUNTRY_FLAGS[t1] || COUNTRY_FLAGS[t2]));
+
+  return isIPL || isOdiOrTest || isIntlT20;
 }
 
 function renderCricket(matches) {
