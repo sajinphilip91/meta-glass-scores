@@ -262,9 +262,39 @@ function isIPLorInternational(m) {
   return isIPL || isOdiOrTest || isIntlT20;
 }
 
+// ── DEMO: remove when real cricket matches are live ────────────
+const DUMMY_CRICKET_MATCHES = [
+  {
+    name: 'Mumbai Indians vs Chennai Super Kings, 52nd Match',
+    matchType: 't20',
+    matchStarted: true,
+    matchEnded: false,
+    teams: ['Mumbai Indians', 'Chennai Super Kings'],
+    score: [
+      { inning: 'Mumbai Indians Inning 1', r: 186, w: 5, o: 20 },
+      { inning: 'Chennai Super Kings Inning 1', r: 142, w: 7, o: 17.3 },
+    ],
+  },
+  {
+    name: 'India vs Australia, 3rd T20I',
+    matchType: 't20i',
+    matchStarted: true,
+    matchEnded: false,
+    teams: ['India', 'Australia'],
+    score: [
+      { inning: 'India Inning 1', r: 204, w: 4, o: 20 },
+      { inning: 'Australia Inning 1', r: 97, w: 3, o: 11.2 },
+    ],
+  },
+];
+// ── END DEMO ───────────────────────────────────────────────────
+
 function renderCricket(matches) {
   const el = document.getElementById('cricket-content');
-  const live = matches.filter(m => !m.matchEnded && isIPLorInternational(m));
+  let live = matches.filter(m => !m.matchEnded && isIPLorInternational(m));
+
+  // Use dummy data when no live matches (remove DUMMY_CRICKET_MATCHES line below when going live)
+  if (!live.length) live = DUMMY_CRICKET_MATCHES;
 
   if (!live.length) {
     el.innerHTML = '<div class="no-matches"><div class="no-matches-icon">🏏</div><div class="no-matches-title">No Live Matches</div><div class="no-matches-sub">IPL · International</div></div>';
