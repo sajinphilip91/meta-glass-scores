@@ -236,12 +236,20 @@ async function loadCricket() {
   }
 }
 
+function isIPLorInternational(m) {
+  const name = (m.name || '').toLowerCase();
+  const type = (m.matchType || '').toLowerCase();
+  const isIPL = name.includes('ipl') || name.includes('indian premier league');
+  const isInternational = name.includes('t20i') || name.includes(' odi') || type === 'test' || name.includes(' test');
+  return isIPL || isInternational;
+}
+
 function renderCricket(matches) {
   const el = document.getElementById('cricket-content');
-  const live = matches.filter(m => !m.matchEnded);
+  const live = matches.filter(m => !m.matchEnded && isIPLorInternational(m));
 
   if (!live.length) {
-    el.innerHTML = '<div class="no-matches"><div class="no-matches-icon">🏏</div><div class="no-matches-title">No Live Matches</div><div class="no-matches-sub">No cricket matches live right now.</div></div>';
+    el.innerHTML = '<div class="no-matches"><div class="no-matches-icon">🏏</div><div class="no-matches-title">No Live Matches</div><div class="no-matches-sub">IPL · International</div></div>';
     return;
   }
 
@@ -266,25 +274,82 @@ function renderCricket(matches) {
   el.appendChild(list);
 }
 
+const IPL_TEAMS = {
+  'mumbai indians':              { abbr: 'MI',   bg: '#004BA0', color: '#D1AB3E' },
+  'chennai super kings':         { abbr: 'CSK',  bg: '#FFCA05', color: '#004B8D' },
+  'royal challengers bengaluru': { abbr: 'RCB',  bg: '#E2003B', color: '#FFD700' },
+  'royal challengers bangalore': { abbr: 'RCB',  bg: '#E2003B', color: '#FFD700' },
+  'kolkata knight riders':       { abbr: 'KKR',  bg: '#3A1F6E', color: '#D4AF37' },
+  'delhi capitals':              { abbr: 'DC',   bg: '#17449B', color: '#EF4C23' },
+  'sunrisers hyderabad':         { abbr: 'SRH',  bg: '#F05A28', color: '#1B1B1B' },
+  'punjab kings':                { abbr: 'PBKS', bg: '#C8102E', color: '#FFFFFF' },
+  'rajasthan royals':            { abbr: 'RR',   bg: '#254AA5', color: '#EA1D8B' },
+  'lucknow super giants':        { abbr: 'LSG',  bg: '#4B3F91', color: '#00B4D8' },
+  'gujarat titans':              { abbr: 'GT',   bg: '#1C2951', color: '#02B4CE' },
+};
+
+const COUNTRY_FLAGS = {
+  'india': 'in', 'australia': 'au', 'england': 'gb', 'pakistan': 'pk',
+  'south africa': 'za', 'new zealand': 'nz', 'sri lanka': 'lk',
+  'bangladesh': 'bd', 'zimbabwe': 'zw', 'afghanistan': 'af', 'ireland': 'ie',
+  'netherlands': 'nl', 'nepal': 'np', 'usa': 'us', 'canada': 'ca',
+  'uae': 'ae', 'oman': 'om', 'namibia': 'na', 'scotland': 'gb',
+};
+
+function getCricketTeamVisual(teamName, sizeClass) {
+  const key = (teamName || '').toLowerCase();
+  const ipl = IPL_TEAMS[key];
+  if (ipl) {
+    return `<div class="cricket-badge ${sizeClass}" style="background:${ipl.bg};color:${ipl.color}">${ipl.abbr}</div>`;
+  }
+  const flagCode = COUNTRY_FLAGS[key];
+  if (flagCode) {
+    return `<img class="cricket-flag ${sizeClass}" src="https://flagcdn.com/w80/${flagCode}.png" alt="${teamName}" onerror="this.style.display='none'">`;
+  }
+  const abbr = (teamName || '??').substring(0, 2).toUpperCase();
+  return `<div class="cricket-badge ${sizeClass}" style="background:#2a2a2a;color:#aaa">${abbr}</div>`;
+}
+
+function getTeamScore(scores, teamName) {
+  const t = (teamName || '').toLowerCase();
+  const innings = scores.filter(s => (s.inning || '').toLowerCase().startsWith(t));
+  if (!innings.length) return null;
+  const last = innings[innings.length - 1];
+  return `${last.r}/${last.w}`;
+}
+
 function buildCricketCard(match, large) {
   const card = document.createElement('div');
   card.className = 'match-card focusable';
   card.tabIndex = 0;
-  const matchName = match.name || (match.teams || []).join(' vs ');
-  const type = (match.matchType || 'CRICKET').toUpperCase();
+
+  const teams = match.teams || [];
+  const t1 = teams[0] || '';
+  const t2 = teams[1] || '';
   const scores = match.score || [];
-  const lines = scores.map(s =>
-    `<div class="cricket-line">${shortInning(s.inning)}&nbsp; ${s.r}/${s.w} <span class="ov">(${s.o} ov)</span></div>`
-  ).join('');
+  const s1 = getTeamScore(scores, t1);
+  const s2 = getTeamScore(scores, t2);
+  const sz = large ? 'crest-lg' : 'crest-md';
 
   card.innerHTML = `<div class="inner">
     <div class="live-bar">
       <span class="live-dot"></span>
-      <span class="live-text">LIVE · ${type}</span>
+      <span class="live-text">LIVE</span>
     </div>
-    <div class="cricket-match-name">${matchName}</div>
-    <div class="cricket-innings">
-      ${lines || '<div class="cricket-no-score">Innings yet to begin</div>'}
+    <div class="card-teams">
+      <div class="card-team">
+        ${getCricketTeamVisual(t1, sz)}
+        <div class="card-team-name">${t1}</div>
+        <div class="cricket-card-score">${s1 || '–'}</div>
+      </div>
+      <div class="card-center cricket-center">
+        <div class="cricket-vs">vs</div>
+      </div>
+      <div class="card-team">
+        ${getCricketTeamVisual(t2, sz)}
+        <div class="card-team-name">${t2}</div>
+        <div class="cricket-card-score">${s2 || '–'}</div>
+      </div>
     </div>
   </div>`;
 
