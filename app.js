@@ -366,9 +366,17 @@ function getTeamScore(scores, teamName) {
   return `${last.r}/${last.w}`;
 }
 
+function getTeamOvers(scores, teamName) {
+  const t = (teamName || '').toLowerCase();
+  const innings = scores.filter(s => (s.inning || '').toLowerCase().startsWith(t));
+  if (!innings.length) return null;
+  const last = innings[innings.length - 1];
+  return last.o != null ? String(last.o) : null;
+}
+
 function buildCricketCard(match, large) {
   const card = document.createElement('div');
-  card.className = 'match-card focusable';
+  card.className = `match-card focusable${large ? ' cricket-large' : ''}`;
   card.tabIndex = 0;
 
   const teams = match.teams || [];
@@ -377,6 +385,8 @@ function buildCricketCard(match, large) {
   const scores = match.score || [];
   const s1 = getTeamScore(scores, t1);
   const s2 = getTeamScore(scores, t2);
+  const ov1 = getTeamOvers(scores, t1);
+  const ov2 = getTeamOvers(scores, t2);
   const sz = large ? 'crest-lg' : 'crest-md';
 
   card.innerHTML = `<div class="inner">
@@ -386,17 +396,27 @@ function buildCricketCard(match, large) {
     </div>
     <div class="card-teams">
       <div class="card-team">
-        ${getCricketTeamVisual(t1, sz)}
+        <div class="cricket-team-top">
+          ${getCricketTeamVisual(t1, sz)}
+          <div class="cricket-score-block">
+            <div class="cricket-card-score">${s1 || '–'}</div>
+            ${ov1 ? `<div class="cricket-card-overs">${ov1} ov</div>` : ''}
+          </div>
+        </div>
         <div class="card-team-name">${t1}</div>
-        <div class="cricket-card-score">${s1 || '–'}</div>
       </div>
       <div class="card-center cricket-center">
         <div class="cricket-vs">vs</div>
       </div>
       <div class="card-team">
-        ${getCricketTeamVisual(t2, sz)}
+        <div class="cricket-team-top right">
+          <div class="cricket-score-block right">
+            <div class="cricket-card-score">${s2 || '–'}</div>
+            ${ov2 ? `<div class="cricket-card-overs">${ov2} ov</div>` : ''}
+          </div>
+          ${getCricketTeamVisual(t2, sz)}
+        </div>
         <div class="card-team-name">${t2}</div>
-        <div class="cricket-card-score">${s2 || '–'}</div>
       </div>
     </div>
   </div>`;

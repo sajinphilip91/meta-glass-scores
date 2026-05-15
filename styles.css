@@ -419,14 +419,35 @@ html, body {
 .cricket-flag.crest-lg { width: 64px; height: 44px; }
 .cricket-flag.crest-md { width: 48px; height: 33px; }
 
+.cricket-team-top {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.cricket-team-top.right { flex-direction: row-reverse; }
+
+.cricket-score-block {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.cricket-score-block.right { align-items: flex-end; }
+
 .cricket-card-score {
-  font-size: 20px;
+  font-size: 18px;
   font-weight: 700;
   color: #FFFFFF;
   letter-spacing: -0.5px;
-  text-align: center;
+  line-height: 1;
 }
-.single-match-wrap .cricket-card-score { font-size: 28px; }
+.cricket-large .cricket-card-score { font-size: 24px; }
+
+.cricket-card-overs {
+  font-size: 10px;
+  color: #6b7280;
+  letter-spacing: 0.3px;
+}
+.cricket-large .cricket-card-overs { font-size: 11px; }
 
 .cricket-center { min-width: 48px !important; }
 
