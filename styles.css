@@ -12,6 +12,7 @@ html, body {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   color: #FFFFFF;
   user-select: none;
+  -webkit-font-smoothing: antialiased;
 }
 
 #app {
@@ -20,7 +21,7 @@ html, body {
   position: relative;
 }
 
-/* ── Screens ── */
+/* ── Screens ────────────────────────────────────────────────── */
 .screen {
   position: absolute;
   inset: 0;
@@ -28,12 +29,9 @@ html, body {
   display: none;
   flex-direction: column;
 }
+.screen.active { display: flex; }
 
-.screen.active {
-  display: flex;
-}
-
-/* ── Header ── */
+/* ── Header — 64px tall per spec ───────────────────────────── */
 .screen-header {
   height: 64px;
   display: flex;
@@ -44,14 +42,16 @@ html, body {
 }
 
 .header-title {
-  font-size: 16px;
+  font-size: 14px;
   font-weight: 700;
-  letter-spacing: 2px;
-  color: #FFFFFF;
+  letter-spacing: 3px;
+  color: #B0B3B8;
   flex: 1;
   text-align: center;
+  text-transform: uppercase;
 }
 
+/* ── Icon buttons ───────────────────────────────────────────── */
 .icon-btn {
   width: 44px;
   height: 44px;
@@ -64,152 +64,132 @@ html, body {
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: background 300ms cubic-bezier(0.4, 0.04, 0.5, 1),
-              border-color 300ms cubic-bezier(0.4, 0.04, 0.5, 1);
   flex-shrink: 0;
+  transition:
+    background 300ms cubic-bezier(0.4, 0.04, 0.5, 1),
+    border-color 300ms cubic-bezier(0.4, 0.04, 0.5, 1);
 }
-
 .icon-btn:focus {
   outline: none;
   background: #1C1E21;
-  border-color: #FFFFFF;
+  border-color: rgba(255,255,255,0.4);
 }
+.icon-btn:active { transform: scale(0.92); }
 
-/* ── Screen content ── */
-.screen-content {
-  flex: 1;
-  overflow: hidden;
-  display: flex;
-  flex-direction: column;
-}
-
-/* ── Home: Sport Selector ── */
+/* ── Home Screen ────────────────────────────────────────────── */
 .sport-selector {
   flex: 1;
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 12px;
   justify-content: center;
-  padding: 8px 16px 24px;
+  padding: 0 8px 16px;
 }
 
+/* 88px min height per spec */
 .sport-btn {
+  min-height: 88px;
   background: #0a0a0f;
   border: 2px solid transparent;
   border-radius: 20px;
-  padding: 28px 32px;
+  padding: 0 28px;
   display: flex;
   align-items: center;
-  gap: 24px;
+  gap: 20px;
   cursor: pointer;
   width: 100%;
-  transition: transform 475ms cubic-bezier(0.6, 0, 0.4, 1),
-              border-color 300ms cubic-bezier(0.4, 0.04, 0.5, 1);
+  transition:
+    transform 475ms cubic-bezier(0.6, 0, 0.4, 1),
+    border-color 300ms cubic-bezier(0.4, 0.04, 0.5, 1);
 }
+.sport-btn .content { opacity: 0.8; display: flex; align-items: center; gap: 20px; width: 100%; transition: opacity 300ms cubic-bezier(0.4, 0.04, 0.5, 1); }
+.sport-btn:focus { outline: none; border-color: rgba(255,255,255,0.5); transform: scale(calc(1 - 8/88)); }
+.sport-btn:focus .content { opacity: 1; }
+.sport-btn:active { transform: scale(0.94); transition: transform 100ms cubic-bezier(0.68, 0, 0.29, 1); }
 
-.sport-btn:focus {
-  outline: none;
-  border-color: #FFFFFF;
-  transform: scale(0.97);
-}
+.sport-icon { font-size: 40px; line-height: 1; flex-shrink: 0; }
 
-.sport-icon {
-  font-size: 44px;
-  line-height: 1;
-}
+.sport-info { display: flex; flex-direction: column; gap: 3px; }
+.sport-label { font-size: 22px; font-weight: 700; color: #FFFFFF; letter-spacing: 1px; }
+.sport-sub { font-size: 12px; color: #B0B3B8; letter-spacing: 0.3px; }
 
-.sport-info {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-  text-align: left;
-}
+/* ── Match List ─────────────────────────────────────────────── */
+.screen-content { flex: 1; overflow: hidden; display: flex; flex-direction: column; }
 
-.sport-label {
-  font-size: 22px;
-  font-weight: 700;
-  color: #FFFFFF;
-  letter-spacing: 1.5px;
-}
-
-.sport-sub {
-  font-size: 12px;
-  color: #B0B3B8;
-  letter-spacing: 0.5px;
-}
-
-/* ── Match List ── */
 .match-list {
   flex: 1;
   overflow-y: auto;
   display: flex;
   flex-direction: column;
-  gap: 10px;
-  padding: 4px 8px 64px;
+  gap: 8px;
+  padding: 4px 8px 72px;
   position: relative;
   scrollbar-width: none;
 }
-
 .match-list::-webkit-scrollbar { display: none; }
 
+/* Scrim — signals more content below */
 .match-list::after {
   content: '';
   position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  height: 64px;
+  bottom: 0; left: 0; right: 0;
+  height: 72px;
   background: linear-gradient(to top, #000000 0%, transparent 100%);
   pointer-events: none;
   z-index: 1;
 }
 
-/* ── Match Card ── */
+/* ── Match Card ─────────────────────────────────────────────── */
 .match-card {
   background: #0a0a0f;
   border: 2px solid transparent;
   border-radius: 16px;
-  padding: 16px;
+  padding: 14px 16px;
   cursor: pointer;
   flex-shrink: 0;
-  transition: transform 475ms cubic-bezier(0.6, 0, 0.4, 1),
-              border-color 300ms cubic-bezier(0.4, 0.04, 0.5, 1);
+  transition:
+    transform 475ms cubic-bezier(0.6, 0, 0.4, 1),
+    border-color 300ms cubic-bezier(0.4, 0.04, 0.5, 1);
 }
+.match-card .card-content { opacity: 0.8; transition: opacity 300ms cubic-bezier(0.4, 0.04, 0.5, 1); }
+.match-card:focus { outline: none; border-color: rgba(255,255,255,0.4); transform: scale(0.97); }
+.match-card:focus .card-content { opacity: 1; }
+.match-card:active { transform: scale(0.95); transition: transform 100ms cubic-bezier(0.68, 0, 0.29, 1); }
 
-.match-card:focus {
-  outline: none;
-  border-color: #FFFFFF;
-  transform: scale(0.97);
-}
-
-.match-competition {
-  font-size: 11px;
+.match-comp {
+  font-size: 10px;
   color: #B0B3B8;
   text-transform: uppercase;
-  letter-spacing: 1px;
+  letter-spacing: 1.5px;
   text-align: center;
-  margin-bottom: 14px;
+  margin-bottom: 10px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
-.match-teams {
+/* Football card layout */
+.match-row {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 8px;
 }
 
-.team-block {
+.team-col {
   flex: 1;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 8px;
+  gap: 6px;
+  min-width: 0;
 }
 
 .team-crest {
-  width: 44px;
-  height: 44px;
+  width: 40px;
+  height: 40px;
   object-fit: contain;
+  flex-shrink: 0;
 }
 
 .team-name {
@@ -219,58 +199,116 @@ html, body {
   text-transform: uppercase;
   letter-spacing: 0.5px;
   color: #E4E6EB;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  width: 100%;
 }
 
-.score-block {
+.score-col {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 4px;
-  min-width: 90px;
+  gap: 2px;
+  flex-shrink: 0;
+  min-width: 96px;
 }
 
-.score-text {
-  font-size: 34px;
+.score-big {
+  font-size: 40px;
   font-weight: 700;
-  letter-spacing: 3px;
+  letter-spacing: 4px;
   color: #FFFFFF;
+  line-height: 1;
 }
 
-.match-minute {
+.score-minute {
   font-size: 11px;
   color: #B0B3B8;
+  letter-spacing: 0.5px;
 }
 
-.match-status-badge {
+.status-badge {
   font-size: 9px;
   font-weight: 700;
-  letter-spacing: 1.5px;
+  letter-spacing: 2px;
   text-transform: uppercase;
   color: #ff4d4d;
+  margin-top: 2px;
+}
+.status-badge.ft { color: #6b7280; }
+.status-badge.ht { color: #f59e0b; }
+
+/* Cricket card */
+.cricket-match-name {
+  font-size: 12px;
+  font-weight: 600;
+  color: #E4E6EB;
+  text-align: center;
+  margin-bottom: 10px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
-.match-status-badge.ft { color: #B0B3B8; }
-.match-status-badge.ht { color: #f59e0b; }
+.cricket-innings {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
 
-/* ── Match Detail ── */
+.cricket-line {
+  font-size: 13px;
+  font-weight: 600;
+  color: #E4E6EB;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.cricket-line-muted {
+  font-size: 12px;
+  color: #6b7280;
+  font-style: italic;
+}
+
+/* ── Match Detail — broadcast style ─────────────────────────── */
+.detail-wrap {
+  flex: 1;
+  padding: 0 8px 8px;
+  display: flex;
+  flex-direction: column;
+}
+
 .detail-card {
   background: #0a0a0f;
   border-radius: 20px;
-  padding: 24px 20px;
-  margin: 0 8px;
   flex: 1;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: space-between;
+  padding: 20px 16px 24px;
+  gap: 8px;
+}
+
+.detail-comp {
+  font-size: 10px;
+  color: #B0B3B8;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  text-align: center;
 }
 
 .detail-stage {
-  font-size: 11px;
-  color: #B0B3B8;
+  font-size: 12px;
+  color: #6b7280;
   text-align: center;
-  text-transform: uppercase;
-  letter-spacing: 1.5px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  width: 100%;
+  text-align: center;
 }
 
 .detail-teams {
@@ -278,6 +316,7 @@ html, body {
   align-items: center;
   justify-content: space-between;
   width: 100%;
+  flex: 1;
   gap: 8px;
 }
 
@@ -286,12 +325,13 @@ html, body {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 14px;
+  justify-content: center;
+  gap: 12px;
 }
 
 .detail-crest {
-  width: 88px;
-  height: 88px;
+  width: 80px;
+  height: 80px;
   object-fit: contain;
 }
 
@@ -302,224 +342,185 @@ html, body {
   letter-spacing: 1px;
   text-align: center;
   color: #E4E6EB;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  width: 100%;
+  text-align: center;
 }
 
-.detail-score-center {
+.detail-center {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 6px;
+  gap: 4px;
   flex-shrink: 0;
 }
 
-.detail-score-text {
-  font-size: 52px;
+.detail-score {
+  font-size: 64px;
   font-weight: 700;
-  letter-spacing: 4px;
+  letter-spacing: 6px;
   color: #FFFFFF;
+  line-height: 1;
 }
 
 .detail-time {
-  font-size: 14px;
+  font-size: 15px;
   color: #B0B3B8;
+  letter-spacing: 1px;
 }
 
 .detail-status {
   font-size: 11px;
   font-weight: 700;
-  letter-spacing: 1.5px;
+  letter-spacing: 2px;
   text-transform: uppercase;
   color: #ff4d4d;
 }
+.detail-status.ft { color: #6b7280; }
+.detail-status.ht { color: #f59e0b; }
 
-/* ── Cricket Scores ── */
-.cricket-scores {
+/* Cricket detail */
+.cricket-detail-innings {
   display: flex;
   flex-direction: column;
-  gap: 6px;
-  margin-top: 4px;
-}
-
-.cricket-score-line {
-  font-size: 13px;
-  color: #E4E6EB;
-  font-weight: 600;
-}
-
-.cricket-detail-scores {
-  display: flex;
-  flex-direction: column;
-  gap: 24px;
+  gap: 20px;
   width: 100%;
-  justify-content: center;
   flex: 1;
+  justify-content: center;
 }
 
-.cricket-team-score {
+.cricket-inning-row {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 4px;
+  gap: 2px;
 }
 
-.cricket-team-name {
-  font-size: 13px;
+.cricket-inning-label {
+  font-size: 11px;
   color: #B0B3B8;
   text-transform: uppercase;
-  letter-spacing: 1px;
-  font-weight: 600;
+  letter-spacing: 1.5px;
+  text-align: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
 }
 
-.cricket-runs {
-  font-size: 40px;
+.cricket-inning-score {
+  font-size: 44px;
   font-weight: 700;
   color: #FFFFFF;
+  letter-spacing: 2px;
+  line-height: 1.1;
 }
 
-.cricket-overs {
+.cricket-inning-overs {
   font-size: 12px;
-  color: #B0B3B8;
+  color: #6b7280;
 }
 
-/* ── No Matches ── */
+/* ── No Matches ─────────────────────────────────────────────── */
 .no-matches {
   flex: 1;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 12px;
+  gap: 10px;
   text-align: center;
   padding: 24px;
 }
 
-.no-matches-icon {
-  font-size: 52px;
-  line-height: 1;
-}
+.no-matches-icon { font-size: 48px; line-height: 1; opacity: 0.5; }
+.no-matches-title { font-size: 20px; font-weight: 700; color: #FFFFFF; }
+.no-matches-sub { font-size: 13px; color: #B0B3B8; line-height: 1.6; }
 
-.no-matches-title {
-  font-size: 20px;
-  font-weight: 700;
-  color: #FFFFFF;
-}
-
-.no-matches-sub {
-  font-size: 13px;
-  color: #B0B3B8;
-  line-height: 1.6;
-}
-
-/* ── Loading ── */
+/* ── Loading ─────────────────────────────────────────────────── */
 .loading {
   flex: 1;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 14px;
-  color: #B0B3B8;
-  letter-spacing: 1px;
+  font-size: 12px;
+  color: #6b7280;
+  letter-spacing: 2px;
+  text-transform: uppercase;
 }
 
-/* ── Settings ── */
+/* ── Settings ───────────────────────────────────────────────── */
 .settings-list {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 8px;
   padding: 4px 8px;
 }
 
+/* 88px min height per spec */
 .setting-item {
+  min-height: 88px;
   background: #0a0a0f;
   border: 2px solid transparent;
-  border-radius: 14px;
-  padding: 22px 24px;
+  border-radius: 16px;
+  padding: 0 24px;
   display: flex;
   align-items: center;
   justify-content: space-between;
   cursor: pointer;
-  transition: border-color 300ms cubic-bezier(0.4, 0.04, 0.5, 1);
+  transition:
+    border-color 300ms cubic-bezier(0.4, 0.04, 0.5, 1);
 }
+.setting-item:focus { outline: none; border-color: rgba(255,255,255,0.4); }
+.setting-item:active { background: #111114; }
 
-.setting-item:focus {
-  outline: none;
-  border-color: #FFFFFF;
-}
+.setting-label { font-size: 16px; font-weight: 600; color: #FFFFFF; }
+.setting-toggle { font-size: 13px; font-weight: 700; color: #6b7280; letter-spacing: 1px; }
+.setting-toggle.on { color: #4ade80; }
+.setting-value { font-size: 13px; color: #B0B3B8; }
 
-.setting-label {
-  font-size: 16px;
-  font-weight: 600;
-  color: #FFFFFF;
-}
-
-.setting-toggle {
-  font-size: 13px;
-  font-weight: 700;
-  color: #B0B3B8;
-  letter-spacing: 1px;
-}
-
-.setting-toggle.on {
-  color: #4ade80;
-}
-
-.setting-value {
-  font-size: 13px;
-  color: #B0B3B8;
-}
-
-/* ── Dialog ── */
+/* ── Dialog ─────────────────────────────────────────────────── */
 .dialog {
   position: absolute;
   inset: 0;
-  background: rgba(0, 0, 0, 0.75);
+  background: rgba(0,0,0,0.8);
   display: flex;
   align-items: center;
   justify-content: center;
   z-index: 200;
 }
-
-.dialog.hidden {
-  display: none;
-}
+.dialog.hidden { display: none; }
 
 .dialog-box {
   background: #1C1E21;
-  border: 2px solid #3a3b3c;
+  border: 1px solid rgba(255,255,255,0.1);
   border-radius: 20px;
   padding: 36px 32px;
   text-align: center;
   display: flex;
   flex-direction: column;
   gap: 28px;
-  min-width: 320px;
+  min-width: 300px;
 }
 
-.dialog-text {
-  font-size: 18px;
-  font-weight: 600;
-  color: #FFFFFF;
-}
+.dialog-text { font-size: 17px; font-weight: 600; color: #FFFFFF; }
 
-.dialog-buttons {
-  display: flex;
-  gap: 16px;
-  justify-content: center;
-}
+.dialog-buttons { display: flex; gap: 12px; justify-content: center; }
 
 .dialog-btn {
-  background: #3a3b3c;
+  background: #2a2b2d;
   border: 2px solid transparent;
   border-radius: 12px;
   color: #FFFFFF;
-  font-size: 16px;
+  font-size: 15px;
   font-weight: 600;
   padding: 14px 36px;
   cursor: pointer;
-  transition: border-color 300ms cubic-bezier(0.4, 0.04, 0.5, 1);
+  transition:
+    border-color 300ms cubic-bezier(0.4, 0.04, 0.5, 1),
+    transform 100ms cubic-bezier(0.68, 0, 0.29, 1);
 }
-
-.dialog-btn:focus {
-  outline: none;
-  border-color: #FFFFFF;
-}
+.dialog-btn:focus { outline: none; border-color: rgba(255,255,255,0.5); }
+.dialog-btn:active { transform: scale(0.95); }

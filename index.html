@@ -9,51 +9,56 @@
 <body>
   <div id="app">
 
-    <!-- Home Screen -->
+    <!-- Home -->
     <div id="screen-home" class="screen">
       <div class="screen-header">
-        <div class="header-title">LIVE SCORES</div>
+        <div class="icon-btn"></div>
+        <div class="header-title">Live Scores</div>
         <button class="icon-btn focusable" id="btn-settings-home" aria-label="Settings">⚙</button>
       </div>
       <div class="sport-selector">
         <button class="sport-btn focusable" id="btn-football">
-          <span class="sport-icon">⚽</span>
-          <div class="sport-info">
-            <span class="sport-label">FOOTBALL</span>
-            <span class="sport-sub">World Cup · La Liga</span>
+          <div class="content">
+            <span class="sport-icon">⚽</span>
+            <div class="sport-info">
+              <span class="sport-label">Football</span>
+              <span class="sport-sub">World Cup · La Liga</span>
+            </div>
           </div>
         </button>
         <button class="sport-btn focusable" id="btn-cricket">
-          <span class="sport-icon">🏏</span>
-          <div class="sport-info">
-            <span class="sport-label">CRICKET</span>
-            <span class="sport-sub">IPL · International</span>
+          <div class="content">
+            <span class="sport-icon">🏏</span>
+            <div class="sport-info">
+              <span class="sport-label">Cricket</span>
+              <span class="sport-sub">IPL · International</span>
+            </div>
           </div>
         </button>
       </div>
     </div>
 
-    <!-- Football Screen -->
+    <!-- Football -->
     <div id="screen-football" class="screen">
       <div class="screen-header">
         <button class="icon-btn focusable" id="btn-back-football" aria-label="Back">←</button>
-        <div class="header-title">FOOTBALL</div>
+        <div class="header-title">Football</div>
         <button class="icon-btn focusable" id="btn-settings-football" aria-label="Settings">⚙</button>
       </div>
       <div id="football-content" class="screen-content"></div>
     </div>
 
-    <!-- Cricket Screen -->
+    <!-- Cricket -->
     <div id="screen-cricket" class="screen">
       <div class="screen-header">
         <button class="icon-btn focusable" id="btn-back-cricket" aria-label="Back">←</button>
-        <div class="header-title">CRICKET</div>
+        <div class="header-title">Cricket</div>
         <button class="icon-btn focusable" id="btn-settings-cricket" aria-label="Settings">⚙</button>
       </div>
       <div id="cricket-content" class="screen-content"></div>
     </div>
 
-    <!-- Match Detail Screen -->
+    <!-- Match Detail -->
     <div id="screen-match-detail" class="screen">
       <div class="screen-header">
         <button class="icon-btn focusable" id="btn-back-detail" aria-label="Back">←</button>
@@ -63,11 +68,11 @@
       <div id="match-detail-content" class="screen-content"></div>
     </div>
 
-    <!-- Settings Screen -->
+    <!-- Settings -->
     <div id="screen-settings" class="screen">
       <div class="screen-header">
         <button class="icon-btn focusable" id="btn-back-settings" aria-label="Back">←</button>
-        <div class="header-title">SETTINGS</div>
+        <div class="header-title">Settings</div>
         <div class="icon-btn"></div>
       </div>
       <div class="settings-list">
@@ -85,7 +90,7 @@
       </div>
     </div>
 
-    <!-- Set Default Dialog -->
+    <!-- Default Sport Dialog -->
     <div id="dialog-default" class="dialog hidden">
       <div class="dialog-box">
         <p class="dialog-text">Set as your default sport?</p>
