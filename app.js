@@ -50,6 +50,37 @@ function selectSport(sport) {
   }
 }
 
+// ── Match card builder (shared by list + single + detail) ──────
+function buildMatchCard(match, scoreClass, crestClass) {
+  const home = match.homeTeam;
+  const away = match.awayTeam;
+  const s = match.score;
+  const hg = s?.fullTime?.home ?? s?.halfTime?.home ?? '–';
+  const ag = s?.fullTime?.away ?? s?.halfTime?.away ?? '–';
+  const min = match.minute ? match.minute + "'" : '';
+  const comp = match.competition?.name || '';
+
+  return `
+    <div class="live-bar">
+      <span class="live-dot"></span>
+      <span class="live-text">LIVE · ${comp}</span>
+    </div>
+    <div class="card-teams">
+      <div class="card-team">
+        ${home.crest ? `<img class="${crestClass}" src="${home.crest}" alt="" onerror="this.style.display='none'">` : ''}
+        <div class="card-team-name">${home.shortName || home.name}</div>
+      </div>
+      <div class="card-center">
+        <div class="${scoreClass}">${hg}:${ag}</div>
+        <div class="card-time">${min}</div>
+      </div>
+      <div class="card-team">
+        ${away.crest ? `<img class="${crestClass}" src="${away.crest}" alt="" onerror="this.style.display='none'">` : ''}
+        <div class="card-team-name">${away.shortName || away.name}</div>
+      </div>
+    </div>`;
+}
+
 // ── Football ───────────────────────────────────────────────────
 async function loadFootball() {
   const el = document.getElementById('football-content');
@@ -60,90 +91,86 @@ async function loadFootball() {
     const data = await res.json();
     renderFootball(data.matches || []);
   } catch {
-    el.innerHTML = noMatchesHTML('⚽', 'Could not load', 'Check your connection.');
+    el.innerHTML = '<div class="no-matches"><div class="no-matches-icon">⚽</div><div class="no-matches-title">Could not load</div><div class="no-matches-sub">Check your connection.</div></div>';
   }
 }
 
 function renderFootball(matches) {
   const el = document.getElementById('football-content');
+
   if (!matches.length) {
-    el.innerHTML = noMatchesHTML('⚽', 'No Live Matches', 'No World Cup or La Liga\nmatches live right now.');
+    el.innerHTML = '<div class="no-matches"><div class="no-matches-icon">⚽</div><div class="no-matches-title">No Live Matches</div><div class="no-matches-sub">No World Cup or La Liga matches live right now.</div></div>';
     return;
   }
-  const list = document.createElement('div');
-  list.className = 'match-list';
-  matches.forEach(match => {
-    const home = match.homeTeam;
-    const away = match.awayTeam;
-    const s = match.score;
-    const hg = s?.fullTime?.home ?? s?.halfTime?.home ?? '–';
-    const ag = s?.fullTime?.away ?? s?.halfTime?.away ?? '–';
-    const min = match.minute ? match.minute + "'" : '';
-    const comp = match.competition?.name || '';
-    const md = match.matchday ? ' · MD ' + match.matchday : '';
 
+  // ONE GAME — card anchored to bottom, big score
+  if (matches.length === 1) {
+    const match = matches[0];
     const card = document.createElement('div');
     card.className = 'match-card focusable';
     card.tabIndex = 0;
-    card.innerHTML = `
-      <div class="card-content">
-        <div class="match-comp">${comp}${md}</div>
-        <div class="match-row">
-          <div class="team-col">
-            ${home.crest ? `<img class="team-crest" src="${home.crest}" alt="" onerror="this.style.display='none'">` : ''}
-            <div class="team-name">${home.shortName || home.name}</div>
-          </div>
-          <div class="score-col">
-            <div class="score-big">${hg}:${ag}</div>
-            <div class="score-minute">${min}</div>
-            <div class="status-badge ${statusClass(match.status)}">${statusLabel(match.status)}</div>
-          </div>
-          <div class="team-col">
-            ${away.crest ? `<img class="team-crest" src="${away.crest}" alt="" onerror="this.style.display='none'">` : ''}
-            <div class="team-name">${away.shortName || away.name}</div>
-          </div>
-        </div>
-      </div>`;
+    card.innerHTML = `<div class="inner">${buildMatchCard(match, 'score-full', 'crest-lg')}</div>`;
+
+    const wrap = document.createElement('div');
+    wrap.className = 'single-match-wrap';
+    wrap.appendChild(card);
+
+    el.innerHTML = '';
+    el.appendChild(wrap);
+
+    card.addEventListener('click', () => openFootballDetail(match));
+    card.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openFootballDetail(match); } });
+    card.focus();
+    return;
+  }
+
+  // MULTIPLE GAMES — scrollable list
+  const list = document.createElement('div');
+  list.className = 'match-list';
+
+  matches.forEach(match => {
+    const card = document.createElement('div');
+    card.className = 'match-card focusable';
+    card.tabIndex = 0;
+    card.innerHTML = `<div class="inner">${buildMatchCard(match, 'score-list', 'crest-md')}</div>`;
     card.addEventListener('click', () => openFootballDetail(match));
     card.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openFootballDetail(match); } });
     list.appendChild(card);
   });
+
   el.innerHTML = '';
   el.appendChild(list);
 }
 
+// ── Football detail — card + goalscorers ──────────────────────
 function openFootballDetail(match) {
   const home = match.homeTeam;
   const away = match.awayTeam;
-  const s = match.score;
-  const hg = s?.fullTime?.home ?? s?.halfTime?.home ?? '–';
-  const ag = s?.fullTime?.away ?? s?.halfTime?.away ?? '–';
-  const min = match.minute ? match.minute + "'" : '';
-  const stage = [match.stage, match.matchday ? 'Matchday ' + match.matchday : ''].filter(Boolean).join(' · ');
+  const goals = match.goals || [];
+
+  // Split goals by team
+  const homeGoals = goals.filter(g => g.team?.id === home.id);
+  const awayGoals = goals.filter(g => g.team?.id === away.id);
+
+  const scorerHTML = (goalList) => goalList.map(g => {
+    const name = g.scorer?.name || '';
+    const min = g.minute ? g.minute + "'" + (g.injuryTime ? ' +' + g.injuryTime : '') : '';
+    return `<div class="scorer-name">${name}<span class="minute">${min}</span></div>`;
+  }).join('');
 
   document.getElementById('detail-competition-header').textContent = match.competition?.name || 'Football';
   document.getElementById('match-detail-content').innerHTML = `
     <div class="detail-wrap">
-      <div class="detail-card">
-        <div class="detail-comp">${match.competition?.name || ''}</div>
-        <div class="detail-stage">${stage}</div>
-        <div class="detail-teams">
-          <div class="detail-team">
-            ${home.crest ? `<img class="detail-crest" src="${home.crest}" alt="" onerror="this.style.display='none'">` : ''}
-            <div class="detail-name">${home.shortName || home.name}</div>
-          </div>
-          <div class="detail-center">
-            <div class="detail-score">${hg}:${ag}</div>
-            <div class="detail-time">${min}</div>
-            <div class="detail-status ${statusClass(match.status)}">${statusLabel(match.status)}</div>
-          </div>
-          <div class="detail-team">
-            ${away.crest ? `<img class="detail-crest" src="${away.crest}" alt="" onerror="this.style.display='none'">` : ''}
-            <div class="detail-name">${away.shortName || away.name}</div>
-          </div>
-        </div>
+      <div class="match-card" style="border-color:rgba(255,255,255,0.12)">
+        <div class="inner">${buildMatchCard(match, 'score-detail', 'crest-lg')}</div>
       </div>
+      ${goals.length ? `
+      <div class="goalscorers">
+        <div class="scorer-col">${scorerHTML(homeGoals)}</div>
+        <div class="scorer-col right">${scorerHTML(awayGoals)}</div>
+      </div>` : ''}
     </div>`;
+
   showScreen('match-detail', 'football');
 }
 
@@ -157,93 +184,100 @@ async function loadCricket() {
     const data = await res.json();
     renderCricket(data.data || []);
   } catch {
-    el.innerHTML = noMatchesHTML('🏏', 'Could not load', 'Check your connection.');
+    el.innerHTML = '<div class="no-matches"><div class="no-matches-icon">🏏</div><div class="no-matches-title">Could not load</div><div class="no-matches-sub">Check your connection.</div></div>';
   }
 }
 
 function renderCricket(matches) {
   const el = document.getElementById('cricket-content');
   const live = matches.filter(m => !m.matchEnded);
+
   if (!live.length) {
-    el.innerHTML = noMatchesHTML('🏏', 'No Live Matches', 'No cricket matches live right now.');
+    el.innerHTML = '<div class="no-matches"><div class="no-matches-icon">🏏</div><div class="no-matches-title">No Live Matches</div><div class="no-matches-sub">No cricket matches live right now.</div></div>';
     return;
   }
+
+  // ONE GAME
+  if (live.length === 1) {
+    const match = live[0];
+    const card = buildCricketCard(match, true);
+    const wrap = document.createElement('div');
+    wrap.className = 'single-match-wrap';
+    wrap.appendChild(card);
+    el.innerHTML = '';
+    el.appendChild(wrap);
+    card.focus();
+    return;
+  }
+
+  // MULTIPLE
   const list = document.createElement('div');
   list.className = 'match-list';
-  live.forEach(match => {
-    const card = document.createElement('div');
-    card.className = 'match-card focusable';
-    card.tabIndex = 0;
-    const matchName = match.name || (match.teams || []).join(' vs ');
-    const type = (match.matchType || 'CRICKET').toUpperCase();
-    const scores = match.score || [];
-    const lines = scores.map(s =>
-      `<div class="cricket-line">${shortInning(s.inning)}&nbsp;&nbsp;${s.r}/${s.w} <span style="color:#6b7280;font-size:11px">(${s.o} ov)</span></div>`
-    ).join('');
-
-    card.innerHTML = `
-      <div class="card-content">
-        <div class="match-comp">${type}</div>
-        <div class="cricket-match-name">${matchName}</div>
-        <div class="cricket-innings">
-          ${lines || '<div class="cricket-line-muted">Innings yet to begin</div>'}
-          <div class="status-badge" style="margin-top:4px">LIVE</div>
-        </div>
-      </div>`;
-    card.addEventListener('click', () => openCricketDetail(match));
-    card.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openCricketDetail(match); } });
-    list.appendChild(card);
-  });
+  live.forEach(match => list.appendChild(buildCricketCard(match, false)));
   el.innerHTML = '';
   el.appendChild(list);
+}
+
+function buildCricketCard(match, large) {
+  const card = document.createElement('div');
+  card.className = 'match-card focusable';
+  card.tabIndex = 0;
+  const matchName = match.name || (match.teams || []).join(' vs ');
+  const type = (match.matchType || 'CRICKET').toUpperCase();
+  const scores = match.score || [];
+  const lines = scores.map(s =>
+    `<div class="cricket-line">${shortInning(s.inning)}&nbsp; ${s.r}/${s.w} <span class="ov">(${s.o} ov)</span></div>`
+  ).join('');
+
+  card.innerHTML = `<div class="inner">
+    <div class="live-bar">
+      <span class="live-dot"></span>
+      <span class="live-text">LIVE · ${type}</span>
+    </div>
+    <div class="cricket-match-name">${matchName}</div>
+    <div class="cricket-innings">
+      ${lines || '<div class="cricket-no-score">Innings yet to begin</div>'}
+    </div>
+  </div>`;
+
+  card.addEventListener('click', () => openCricketDetail(match));
+  card.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openCricketDetail(match); } });
+  return card;
 }
 
 function openCricketDetail(match) {
   const matchName = match.name || (match.teams || []).join(' vs ');
   const type = (match.matchType || 'Cricket').toUpperCase();
   document.getElementById('detail-competition-header').textContent = type;
-  const scores = match.score || [];
-  const rows = scores.map(s => `
+
+  const rows = (match.score || []).map(s => `
     <div class="cricket-inning-row">
-      <div class="cricket-inning-label">${s.inning || ''}</div>
+      <div class="cricket-inning-label">${shortInning(s.inning)}</div>
       <div class="cricket-inning-score">${s.r}/${s.w}</div>
       <div class="cricket-inning-overs">${s.o} overs</div>
     </div>`).join('');
 
   document.getElementById('match-detail-content').innerHTML = `
     <div class="detail-wrap">
-      <div class="detail-card">
-        <div class="detail-comp">${type}</div>
-        <div class="detail-stage">${matchName}</div>
-        <div class="cricket-detail-innings">
-          ${rows || '<div class="no-matches-sub" style="text-align:center">Innings yet to begin</div>'}
+      <div class="match-card" style="border-color:rgba(255,255,255,0.12)">
+        <div class="inner">
+          <div class="live-bar"><span class="live-dot"></span><span class="live-text">LIVE · ${type}</span></div>
+          <div class="cricket-match-name" style="font-size:13px;margin-bottom:0">${matchName}</div>
         </div>
-        <div class="detail-status">LIVE</div>
       </div>
+      <div class="cricket-detail-rows">
+        ${rows || '<div class="no-matches-sub" style="text-align:center">Innings yet to begin</div>'}
+      </div>
+      <div style="text-align:center;font-size:11px;color:#6b7280;letter-spacing:2px;padding-bottom:8px">LIVE</div>
     </div>`;
+
   showScreen('match-detail', 'cricket');
 }
 
 // ── Helpers ────────────────────────────────────────────────────
-function statusLabel(s) {
-  return { IN_PLAY: 'LIVE', PAUSED: 'HALF TIME', EXTRA_TIME: 'EXTRA TIME', PENALTY_SHOOTOUT: 'PENALTIES', FINISHED: 'FT' }[s] || s || '';
-}
-function statusClass(s) {
-  if (s === 'FINISHED') return 'ft';
-  if (s === 'PAUSED') return 'ht';
-  return '';
-}
 function shortInning(inning) {
   if (!inning) return '';
-  // "India Women Inning 1" → "India Women"
   return inning.replace(/\s+inning\s*\d*/i, '').trim();
-}
-function noMatchesHTML(icon, title, sub) {
-  return `<div class="no-matches">
-    <div class="no-matches-icon">${icon}</div>
-    <div class="no-matches-title">${title}</div>
-    <div class="no-matches-sub">${sub}</div>
-  </div>`;
 }
 
 // ── Settings ───────────────────────────────────────────────────
@@ -255,7 +289,7 @@ function syncSettings() {
     state.defaultSport ? state.defaultSport[0].toUpperCase() + state.defaultSport.slice(1) : 'None';
 }
 
-// ── D-pad navigation ───────────────────────────────────────────
+// ── D-pad ──────────────────────────────────────────────────────
 document.addEventListener('keydown', e => {
   const dialogOpen = !document.getElementById('dialog-default').classList.contains('hidden');
   const scope = dialogOpen ? '#dialog-default' : '#screen-' + state.currentScreen;
