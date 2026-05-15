@@ -1,0 +1,525 @@
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html, body {
+  width: 600px;
+  height: 600px;
+  overflow: hidden;
+  background: #000000;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  color: #FFFFFF;
+  user-select: none;
+}
+
+#app {
+  width: 600px;
+  height: 600px;
+  position: relative;
+}
+
+/* ── Screens ── */
+.screen {
+  position: absolute;
+  inset: 0;
+  padding: 8px;
+  display: none;
+  flex-direction: column;
+}
+
+.screen.active {
+  display: flex;
+}
+
+/* ── Header ── */
+.screen-header {
+  height: 64px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 4px;
+  flex-shrink: 0;
+}
+
+.header-title {
+  font-size: 16px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  color: #FFFFFF;
+  flex: 1;
+  text-align: center;
+}
+
+.icon-btn {
+  width: 44px;
+  height: 44px;
+  background: transparent;
+  border: 2px solid transparent;
+  border-radius: 50%;
+  color: #FFFFFF;
+  font-size: 18px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 300ms cubic-bezier(0.4, 0.04, 0.5, 1),
+              border-color 300ms cubic-bezier(0.4, 0.04, 0.5, 1);
+  flex-shrink: 0;
+}
+
+.icon-btn:focus {
+  outline: none;
+  background: #1C1E21;
+  border-color: #FFFFFF;
+}
+
+/* ── Screen content ── */
+.screen-content {
+  flex: 1;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ── Home: Sport Selector ── */
+.sport-selector {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  justify-content: center;
+  padding: 8px 16px 24px;
+}
+
+.sport-btn {
+  background: #0a0a0f;
+  border: 2px solid transparent;
+  border-radius: 20px;
+  padding: 28px 32px;
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  cursor: pointer;
+  width: 100%;
+  transition: transform 475ms cubic-bezier(0.6, 0, 0.4, 1),
+              border-color 300ms cubic-bezier(0.4, 0.04, 0.5, 1);
+}
+
+.sport-btn:focus {
+  outline: none;
+  border-color: #FFFFFF;
+  transform: scale(0.97);
+}
+
+.sport-icon {
+  font-size: 44px;
+  line-height: 1;
+}
+
+.sport-info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  text-align: left;
+}
+
+.sport-label {
+  font-size: 22px;
+  font-weight: 700;
+  color: #FFFFFF;
+  letter-spacing: 1.5px;
+}
+
+.sport-sub {
+  font-size: 12px;
+  color: #B0B3B8;
+  letter-spacing: 0.5px;
+}
+
+/* ── Match List ── */
+.match-list {
+  flex: 1;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 4px 8px 64px;
+  position: relative;
+  scrollbar-width: none;
+}
+
+.match-list::-webkit-scrollbar { display: none; }
+
+.match-list::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 64px;
+  background: linear-gradient(to top, #000000 0%, transparent 100%);
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* ── Match Card ── */
+.match-card {
+  background: #0a0a0f;
+  border: 2px solid transparent;
+  border-radius: 16px;
+  padding: 16px;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: transform 475ms cubic-bezier(0.6, 0, 0.4, 1),
+              border-color 300ms cubic-bezier(0.4, 0.04, 0.5, 1);
+}
+
+.match-card:focus {
+  outline: none;
+  border-color: #FFFFFF;
+  transform: scale(0.97);
+}
+
+.match-competition {
+  font-size: 11px;
+  color: #B0B3B8;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  text-align: center;
+  margin-bottom: 14px;
+}
+
+.match-teams {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.team-block {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+.team-crest {
+  width: 44px;
+  height: 44px;
+  object-fit: contain;
+}
+
+.team-name {
+  font-size: 11px;
+  font-weight: 700;
+  text-align: center;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: #E4E6EB;
+}
+
+.score-block {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  min-width: 90px;
+}
+
+.score-text {
+  font-size: 34px;
+  font-weight: 700;
+  letter-spacing: 3px;
+  color: #FFFFFF;
+}
+
+.match-minute {
+  font-size: 11px;
+  color: #B0B3B8;
+}
+
+.match-status-badge {
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: #ff4d4d;
+}
+
+.match-status-badge.ft { color: #B0B3B8; }
+.match-status-badge.ht { color: #f59e0b; }
+
+/* ── Match Detail ── */
+.detail-card {
+  background: #0a0a0f;
+  border-radius: 20px;
+  padding: 24px 20px;
+  margin: 0 8px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.detail-stage {
+  font-size: 11px;
+  color: #B0B3B8;
+  text-align: center;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+}
+
+.detail-teams {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  gap: 8px;
+}
+
+.detail-team {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+}
+
+.detail-crest {
+  width: 88px;
+  height: 88px;
+  object-fit: contain;
+}
+
+.detail-name {
+  font-size: 13px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  text-align: center;
+  color: #E4E6EB;
+}
+
+.detail-score-center {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.detail-score-text {
+  font-size: 52px;
+  font-weight: 700;
+  letter-spacing: 4px;
+  color: #FFFFFF;
+}
+
+.detail-time {
+  font-size: 14px;
+  color: #B0B3B8;
+}
+
+.detail-status {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: #ff4d4d;
+}
+
+/* ── Cricket Scores ── */
+.cricket-scores {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: 4px;
+}
+
+.cricket-score-line {
+  font-size: 13px;
+  color: #E4E6EB;
+  font-weight: 600;
+}
+
+.cricket-detail-scores {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  width: 100%;
+  justify-content: center;
+  flex: 1;
+}
+
+.cricket-team-score {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.cricket-team-name {
+  font-size: 13px;
+  color: #B0B3B8;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  font-weight: 600;
+}
+
+.cricket-runs {
+  font-size: 40px;
+  font-weight: 700;
+  color: #FFFFFF;
+}
+
+.cricket-overs {
+  font-size: 12px;
+  color: #B0B3B8;
+}
+
+/* ── No Matches ── */
+.no-matches {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  text-align: center;
+  padding: 24px;
+}
+
+.no-matches-icon {
+  font-size: 52px;
+  line-height: 1;
+}
+
+.no-matches-title {
+  font-size: 20px;
+  font-weight: 700;
+  color: #FFFFFF;
+}
+
+.no-matches-sub {
+  font-size: 13px;
+  color: #B0B3B8;
+  line-height: 1.6;
+}
+
+/* ── Loading ── */
+.loading {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  color: #B0B3B8;
+  letter-spacing: 1px;
+}
+
+/* ── Settings ── */
+.settings-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 4px 8px;
+}
+
+.setting-item {
+  background: #0a0a0f;
+  border: 2px solid transparent;
+  border-radius: 14px;
+  padding: 22px 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  cursor: pointer;
+  transition: border-color 300ms cubic-bezier(0.4, 0.04, 0.5, 1);
+}
+
+.setting-item:focus {
+  outline: none;
+  border-color: #FFFFFF;
+}
+
+.setting-label {
+  font-size: 16px;
+  font-weight: 600;
+  color: #FFFFFF;
+}
+
+.setting-toggle {
+  font-size: 13px;
+  font-weight: 700;
+  color: #B0B3B8;
+  letter-spacing: 1px;
+}
+
+.setting-toggle.on {
+  color: #4ade80;
+}
+
+.setting-value {
+  font-size: 13px;
+  color: #B0B3B8;
+}
+
+/* ── Dialog ── */
+.dialog {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.75);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 200;
+}
+
+.dialog.hidden {
+  display: none;
+}
+
+.dialog-box {
+  background: #1C1E21;
+  border: 2px solid #3a3b3c;
+  border-radius: 20px;
+  padding: 36px 32px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+  min-width: 320px;
+}
+
+.dialog-text {
+  font-size: 18px;
+  font-weight: 600;
+  color: #FFFFFF;
+}
+
+.dialog-buttons {
+  display: flex;
+  gap: 16px;
+  justify-content: center;
+}
+
+.dialog-btn {
+  background: #3a3b3c;
+  border: 2px solid transparent;
+  border-radius: 12px;
+  color: #FFFFFF;
+  font-size: 16px;
+  font-weight: 600;
+  padding: 14px 36px;
+  cursor: pointer;
+  transition: border-color 300ms cubic-bezier(0.4, 0.04, 0.5, 1);
+}
+
+.dialog-btn:focus {
+  outline: none;
+  border-color: #FFFFFF;
+}

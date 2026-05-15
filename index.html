@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=600, height=600, initial-scale=1.0, user-scalable=no">
+  <title>Live Scores</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div id="app">
+
+    <!-- Home Screen -->
+    <div id="screen-home" class="screen">
+      <div class="screen-header">
+        <div class="header-title">LIVE SCORES</div>
+        <button class="icon-btn focusable" id="btn-settings-home" aria-label="Settings">⚙</button>
+      </div>
+      <div class="sport-selector">
+        <button class="sport-btn focusable" id="btn-football">
+          <span class="sport-icon">⚽</span>
+          <div class="sport-info">
+            <span class="sport-label">FOOTBALL</span>
+            <span class="sport-sub">World Cup · La Liga</span>
+          </div>
+        </button>
+        <button class="sport-btn focusable" id="btn-cricket">
+          <span class="sport-icon">🏏</span>
+          <div class="sport-info">
+            <span class="sport-label">CRICKET</span>
+            <span class="sport-sub">IPL · International</span>
+          </div>
+        </button>
+      </div>
+    </div>
+
+    <!-- Football Screen -->
+    <div id="screen-football" class="screen">
+      <div class="screen-header">
+        <button class="icon-btn focusable" id="btn-back-football" aria-label="Back">←</button>
+        <div class="header-title">FOOTBALL</div>
+        <button class="icon-btn focusable" id="btn-settings-football" aria-label="Settings">⚙</button>
+      </div>
+      <div id="football-content" class="screen-content"></div>
+    </div>
+
+    <!-- Cricket Screen -->
+    <div id="screen-cricket" class="screen">
+      <div class="screen-header">
+        <button class="icon-btn focusable" id="btn-back-cricket" aria-label="Back">←</button>
+        <div class="header-title">CRICKET</div>
+        <button class="icon-btn focusable" id="btn-settings-cricket" aria-label="Settings">⚙</button>
+      </div>
+      <div id="cricket-content" class="screen-content"></div>
+    </div>
+
+    <!-- Match Detail Screen -->
+    <div id="screen-match-detail" class="screen">
+      <div class="screen-header">
+        <button class="icon-btn focusable" id="btn-back-detail" aria-label="Back">←</button>
+        <div class="header-title" id="detail-competition-header"></div>
+        <div class="icon-btn"></div>
+      </div>
+      <div id="match-detail-content" class="screen-content"></div>
+    </div>
+
+    <!-- Settings Screen -->
+    <div id="screen-settings" class="screen">
+      <div class="screen-header">
+        <button class="icon-btn focusable" id="btn-back-settings" aria-label="Back">←</button>
+        <div class="header-title">SETTINGS</div>
+        <div class="icon-btn"></div>
+      </div>
+      <div class="settings-list">
+        <div class="setting-item focusable" id="setting-always-on" tabindex="0">
+          <span class="setting-label">Always On Display</span>
+          <span class="setting-toggle" id="toggle-always-on">OFF</span>
+        </div>
+        <div class="setting-item focusable" id="setting-default-sport" tabindex="0">
+          <span class="setting-label">Default Sport</span>
+          <span class="setting-value" id="value-default-sport">None</span>
+        </div>
+        <div class="setting-item focusable" id="setting-clear-default" tabindex="0">
+          <span class="setting-label">Clear Default</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Set Default Dialog -->
+    <div id="dialog-default" class="dialog hidden">
+      <div class="dialog-box">
+        <p class="dialog-text">Set as your default sport?</p>
+        <div class="dialog-buttons">
+          <button class="dialog-btn focusable" id="btn-set-default">Yes</button>
+          <button class="dialog-btn focusable" id="btn-skip-default">No</button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+  <script src="app.js"></script>
+</body>
+</html>
