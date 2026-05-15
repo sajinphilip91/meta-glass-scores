@@ -89,7 +89,7 @@ async function loadFootball() {
     const res = await fetch('/api/football');
     if (!res.ok) throw new Error(res.status);
     const data = await res.json();
-    renderFootball(data.matches || []);
+    renderFootball(data.matches || [], data.nextMatch || null);
   } catch {
     el.innerHTML = '<div class="no-matches"><div class="no-matches-icon">⚽</div><div class="no-matches-title">Could not load</div><div class="no-matches-sub">Check your connection.</div></div>';
   }
@@ -130,14 +130,21 @@ const DUMMY_MATCHES = [
 ];
 // ── END DEMO ────────────────────────────────────────────────────
 
-function renderFootball(matches) {
+function renderFootball(matches, nextMatch) {
   const el = document.getElementById('football-content');
 
   // Use dummy data when no live matches (remove DUMMY_MATCHES line below when going live)
   if (!matches.length) matches = DUMMY_MATCHES;
 
   if (!matches.length) {
-    el.innerHTML = '<div class="no-matches"><div class="no-matches-icon">⚽</div><div class="no-matches-title">No Live Matches</div><div class="no-matches-sub">No World Cup or La Liga matches live right now.</div></div>';
+    const nextInfo = nextMatch ? formatNextMatch(nextMatch) : null;
+    el.innerHTML = `
+      <div class="no-matches">
+        <div class="no-matches-icon">⚽</div>
+        <div class="no-matches-title">No Live Matches</div>
+        <div class="no-matches-sub">World Cup · La Liga · Champions League · Premier League</div>
+        ${nextInfo ? `<div class="next-match-pill">${nextInfo}</div>` : ''}
+      </div>`;
     return;
   }
 
@@ -291,7 +298,10 @@ function openCricketDetail(match) {
   const type = (match.matchType || 'Cricket').toUpperCase();
   document.getElementById('detail-competition-header').textContent = type;
 
-  const rows = (match.score || []).map(s => `
+  const scores = match.score || [];
+  const hasScores = scores.length > 0;
+
+  const inningRows = scores.map(s => `
     <div class="cricket-inning-row">
       <div class="cricket-inning-label">${shortInning(s.inning)}</div>
       <div class="cricket-inning-score">${s.r}/${s.w}</div>
@@ -300,22 +310,40 @@ function openCricketDetail(match) {
 
   document.getElementById('match-detail-content').innerHTML = `
     <div class="detail-wrap">
-      <div class="match-card" style="border-color:rgba(255,255,255,0.12)">
+      <div class="detail-unified-card">
         <div class="inner">
-          <div class="live-bar"><span class="live-dot"></span><span class="live-text">LIVE · ${type}</span></div>
-          <div class="cricket-match-name" style="font-size:13px;margin-bottom:0">${matchName}</div>
+          <div class="live-bar">
+            <span class="live-dot"></span>
+            <span class="live-text">LIVE · ${type}</span>
+          </div>
+          <div class="cricket-detail-title">${matchName}</div>
+          ${hasScores ? `
+            <div class="detail-divider"></div>
+            <div class="cricket-detail-innings">
+              ${inningRows}
+            </div>
+          ` : `
+            <div class="detail-divider"></div>
+            <div class="cricket-no-score" style="text-align:center;padding:16px 0">Innings yet to begin</div>
+          `}
         </div>
       </div>
-      <div class="cricket-detail-rows">
-        ${rows || '<div class="no-matches-sub" style="text-align:center">Innings yet to begin</div>'}
-      </div>
-      <div style="text-align:center;font-size:11px;color:#6b7280;letter-spacing:2px;padding-bottom:8px">LIVE</div>
     </div>`;
 
   showScreen('match-detail', 'cricket');
 }
 
 // ── Helpers ────────────────────────────────────────────────────
+function formatNextMatch(match) {
+  if (!match) return null;
+  const home = match.homeTeam?.shortName || match.homeTeam?.name || '';
+  const away = match.awayTeam?.shortName || match.awayTeam?.name || '';
+  const date = new Date(match.utcDate);
+  const day = date.toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short' });
+  const time = date.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
+  return `Next: ${home} vs ${away} · ${day} ${time}`;
+}
+
 function shortInning(inning) {
   if (!inning) return '';
   return inning.replace(/\s+inning\s*\d*/i, '').trim();
