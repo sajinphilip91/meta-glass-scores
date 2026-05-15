@@ -409,8 +409,8 @@ function buildCricketCard(match, large) {
         <div class="cricket-vs">vs</div>
       </div>
       <div class="card-team">
-        <div class="cricket-team-top right">
-          <div class="cricket-score-block right">
+        <div class="cricket-team-top">
+          <div class="cricket-score-block">
             <div class="cricket-card-score">${s2 || '–'}</div>
             ${ov2 ? `<div class="cricket-card-overs">${ov2} ov</div>` : ''}
           </div>
