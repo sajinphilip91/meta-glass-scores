@@ -107,11 +107,11 @@ const DUMMY_MATCHES = [
     awayTeam: { id: 86, name: 'Real Madrid CF', shortName: 'Real Madrid', crest: 'https://crests.football-data.org/86.svg' },
     score: { fullTime: { home: 3, away: 2 }, halfTime: { home: 1, away: 1 } },
     goals: [
-      { minute: 7,  injuryTime: null, team: { id: 81 }, scorer: { name: 'L. Messi' } },
-      { minute: 10, injuryTime: 57,   team: { id: 81 }, scorer: { name: 'A. Iniesta' } },
+      { minute: 7,  injuryTime: null, team: { id: 81 }, scorer: { name: 'Lionel Messi' } },
+      { minute: 10, injuryTime: 57,   team: { id: 81 }, scorer: { name: 'Andrés Iniesta' } },
       { minute: 38, injuryTime: null, team: { id: 81 }, scorer: { name: 'R. Lewandowski' } },
-      { minute: 14, injuryTime: null, team: { id: 86 }, scorer: { name: 'C. Ronaldo' } },
-      { minute: 11, injuryTime: null, team: { id: 86 }, scorer: { name: 'S. Ramos' } },
+      { minute: 14, injuryTime: null, team: { id: 86 }, scorer: { name: 'Cristiano Ronaldo' } },
+      { minute: 11, injuryTime: null, team: { id: 86 }, scorer: { name: 'Sergio Ramos' } },
     ],
   },
   {
@@ -180,33 +180,36 @@ function renderFootball(matches) {
   el.appendChild(list);
 }
 
-// ── Football detail — card + goalscorers ──────────────────────
+// ── Football detail — unified card with goalscorers inside ─────
 function openFootballDetail(match) {
   const home = match.homeTeam;
   const away = match.awayTeam;
   const goals = match.goals || [];
-
-  // Split goals by team
   const homeGoals = goals.filter(g => g.team?.id === home.id);
   const awayGoals = goals.filter(g => g.team?.id === away.id);
 
   const scorerHTML = (goalList) => goalList.map(g => {
     const name = g.scorer?.name || '';
     const min = g.minute ? g.minute + "'" + (g.injuryTime ? ' +' + g.injuryTime : '') : '';
-    return `<div class="scorer-name">${name}<span class="minute">${min}</span></div>`;
+    return `<div class="scorer-name">${name}<span class="minute"> ${min}</span></div>`;
   }).join('');
+
+  const hasGoals = goals.length > 0;
 
   document.getElementById('detail-competition-header').textContent = match.competition?.name || 'Football';
   document.getElementById('match-detail-content').innerHTML = `
     <div class="detail-wrap">
-      <div class="match-card" style="border-color:rgba(255,255,255,0.12)">
-        <div class="inner">${buildMatchCard(match, 'score-detail', 'crest-lg')}</div>
+      <div class="detail-unified-card">
+        <div class="inner">
+          ${buildMatchCard(match, 'score-detail', 'crest-lg')}
+          ${hasGoals ? `
+          <div class="detail-divider"></div>
+          <div class="detail-scorers">
+            <div class="scorer-col">${scorerHTML(homeGoals)}</div>
+            <div class="scorer-col right">${scorerHTML(awayGoals)}</div>
+          </div>` : ''}
+        </div>
       </div>
-      ${goals.length ? `
-      <div class="goalscorers">
-        <div class="scorer-col">${scorerHTML(homeGoals)}</div>
-        <div class="scorer-col right">${scorerHTML(awayGoals)}</div>
-      </div>` : ''}
     </div>`;
 
   showScreen('match-detail', 'football');

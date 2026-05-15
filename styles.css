@@ -345,6 +345,40 @@ html, body {
   grid-row: 1 / span 10;
 }
 
+/* ── Detail unified card (score + scorers in one card) ── */
+.detail-unified-card {
+  background: #141414;
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 20px;
+  overflow: hidden;
+  padding: 14px 18px 18px;
+}
+
+.detail-divider {
+  height: 1px;
+  background: rgba(255,255,255,0.08);
+  margin: 14px 0 12px;
+}
+
+.detail-scorers {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0 12px;
+}
+
+.scorer-col { display: flex; flex-direction: column; gap: 5px; }
+.scorer-col.right { align-items: flex-end; }
+
+.scorer-name {
+  font-size: 12px;
+  font-weight: 500;
+  color: #E4E6EB;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.scorer-name .minute { color: #6b7280; font-size: 11px; }
+
 /* ── Cricket card ── */
 .cricket-match-name {
   font-size: 12px; font-weight: 600; color: #E4E6EB;
