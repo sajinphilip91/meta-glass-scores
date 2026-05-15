@@ -57,7 +57,12 @@ function buildMatchCard(match, scoreClass, crestClass) {
   const s = match.score;
   const hg = s?.fullTime?.home ?? s?.halfTime?.home ?? '–';
   const ag = s?.fullTime?.away ?? s?.halfTime?.away ?? '–';
-  const min = match.minute ? match.minute + "'" : '';
+  const min = match.minute != null ? match.minute + "'"
+    : match.status === 'PAUSED' ? 'HT'
+    : match.status === 'EXTRA_TIME' ? 'ET'
+    : match.status === 'PENALTY_SHOOTOUT' ? 'PSO'
+    : match.status === 'IN_PLAY' ? 'LIVE'
+    : '';
   const comp = match.competition?.name || '';
 
   return `
