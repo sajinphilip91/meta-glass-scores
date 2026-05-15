@@ -130,12 +130,13 @@ html, body {
   background: linear-gradient(to top, rgba(90, 65, 0, 0.3) 0%, transparent 100%);
 }
 
-.thumb-emoji {
-  font-size: 40px;
-  line-height: 1;
+.thumb-img {
+  width: 80px;
+  height: 80px;
+  object-fit: contain;
   position: relative;
   z-index: 1;
-  filter: drop-shadow(0 0 8px rgba(210, 140, 0, 0.6));
+  filter: drop-shadow(0 4px 12px rgba(180, 120, 0, 0.7));
 }
 
 /* Sport text */
