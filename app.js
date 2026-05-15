@@ -95,8 +95,46 @@ async function loadFootball() {
   }
 }
 
+// ── DEMO: remove this block when real matches are live ──────────
+const DUMMY_MATCHES = [
+  {
+    competition: { name: 'La Liga' },
+    matchday: 36,
+    stage: 'REGULAR_SEASON',
+    status: 'IN_PLAY',
+    minute: 87,
+    homeTeam: { id: 81, name: 'FC Barcelona', shortName: 'Barcelona', crest: 'https://crests.football-data.org/81.svg' },
+    awayTeam: { id: 86, name: 'Real Madrid CF', shortName: 'Real Madrid', crest: 'https://crests.football-data.org/86.svg' },
+    score: { fullTime: { home: 3, away: 2 }, halfTime: { home: 1, away: 1 } },
+    goals: [
+      { minute: 7,  injuryTime: null, team: { id: 81 }, scorer: { name: 'L. Messi' } },
+      { minute: 10, injuryTime: 57,   team: { id: 81 }, scorer: { name: 'A. Iniesta' } },
+      { minute: 38, injuryTime: null, team: { id: 81 }, scorer: { name: 'R. Lewandowski' } },
+      { minute: 14, injuryTime: null, team: { id: 86 }, scorer: { name: 'C. Ronaldo' } },
+      { minute: 11, injuryTime: null, team: { id: 86 }, scorer: { name: 'S. Ramos' } },
+    ],
+  },
+  {
+    competition: { name: 'La Liga' },
+    matchday: 36,
+    stage: 'REGULAR_SEASON',
+    status: 'PAUSED',
+    minute: 45,
+    homeTeam: { id: 78, name: 'Atletico Madrid', shortName: 'Atlético', crest: 'https://crests.football-data.org/78.svg' },
+    awayTeam: { id: 559, name: 'Sevilla FC', shortName: 'Sevilla', crest: 'https://crests.football-data.org/559.svg' },
+    score: { fullTime: { home: null, away: null }, halfTime: { home: 1, away: 0 } },
+    goals: [
+      { minute: 33, injuryTime: null, team: { id: 78 }, scorer: { name: 'A. Griezmann' } },
+    ],
+  },
+];
+// ── END DEMO ────────────────────────────────────────────────────
+
 function renderFootball(matches) {
   const el = document.getElementById('football-content');
+
+  // Use dummy data when no live matches (remove DUMMY_MATCHES line below when going live)
+  if (!matches.length) matches = DUMMY_MATCHES;
 
   if (!matches.length) {
     el.innerHTML = '<div class="no-matches"><div class="no-matches-icon">⚽</div><div class="no-matches-title">No Live Matches</div><div class="no-matches-sub">No World Cup or La Liga matches live right now.</div></div>';
