@@ -193,15 +193,21 @@ function renderCricket(matches) {
     card.className = 'match-card focusable';
     card.tabIndex = 0;
 
-    const lines = (match.score || []).map((s, i) => {
-      const team = match.teams?.[i] || 'Team ' + (i + 1);
-      return `<div class="cricket-score-line">${team}: ${s.r}/${s.w} (${s.o} ov)</div>`;
+    // cricketdata.org uses match.name ("India vs Australia, 1st T20I")
+    // and score[].inning for the innings label
+    const matchTitle = match.name || (match.teams || []).join(' vs ');
+    const matchType = (match.matchType || 'CRICKET').toUpperCase();
+
+    const lines = (match.score || []).map(s => {
+      const label = s.inning || '';
+      return `<div class="cricket-score-line">${label}: ${s.r}/${s.w} (${s.o} ov)</div>`;
     }).join('');
 
     card.innerHTML = `
-      <div class="match-competition">${(match.matchType || 'CRICKET').toUpperCase()} · ${match.series || ''}</div>
+      <div class="match-competition">${matchType}</div>
+      <div class="match-competition" style="margin-top:-8px;margin-bottom:10px;font-size:12px;color:#E4E6EB">${matchTitle}</div>
       <div class="cricket-scores">
-        ${lines || '<div class="cricket-score-line">Match in progress</div>'}
+        ${lines || '<div class="cricket-score-line" style="color:#B0B3B8">Innings yet to begin</div>'}
         <div class="match-status-badge">LIVE</div>
       </div>`;
 
@@ -217,19 +223,20 @@ function renderCricket(matches) {
 }
 
 function openCricketDetail(match) {
+  const matchTitle = match.name || (match.teams || []).join(' vs ');
   document.getElementById('detail-competition-header').textContent = (match.matchType || 'Cricket').toUpperCase();
 
-  const scoreRows = (match.score || []).map((s, i) => `
+  const scoreRows = (match.score || []).map(s => `
     <div class="cricket-team-score">
-      <div class="cricket-team-name">${match.teams?.[i] || 'Team ' + (i + 1)}</div>
+      <div class="cricket-team-name">${s.inning || ''}</div>
       <div class="cricket-runs">${s.r}/${s.w}</div>
       <div class="cricket-overs">${s.o} overs</div>
     </div>`).join('');
 
   document.getElementById('match-detail-content').innerHTML = `
     <div class="detail-card">
-      <div class="detail-stage">${match.series || ''}</div>
-      <div class="cricket-detail-scores">${scoreRows || '<div class="loading">Match in progress</div>'}</div>
+      <div class="detail-stage">${matchTitle}</div>
+      <div class="cricket-detail-scores">${scoreRows || '<div style="color:#B0B3B8;text-align:center;flex:1;display:flex;align-items:center;justify-content:center">Innings yet to begin</div>'}</div>
       <div class="detail-status">LIVE</div>
     </div>`;
 
