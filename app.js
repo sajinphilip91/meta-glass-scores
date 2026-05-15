@@ -241,16 +241,25 @@ function isIPLorInternational(m) {
   const teams = m.teams || [];
   const t1 = (teams[0] || '').toLowerCase();
   const t2 = (teams[1] || '').toLowerCase();
+  const name = (m.name || '').toLowerCase();
+
+  // Exclude women's, U19, A-team, and emerging matches
+  const isSecondary = [t1, t2, name].some(s =>
+    s.includes('women') || s.includes(' a ') || s.endsWith(' a') ||
+    s.includes('u19') || s.includes('under-19') || s.includes('emerging')
+  );
+  if (isSecondary) return false;
 
   // IPL: either team is a known IPL franchise
   const isIPL = !!(IPL_TEAMS[t1] || IPL_TEAMS[t2]);
 
-  // International ODI or Test are always international
+  // International ODI or Test
   const isOdiOrTest = type === 'odi' || type === 'test';
 
-  // T20I: matchType is t20i, or it's a t20 between two national teams
+  // T20I: explicit type, or a t20 between two national teams
   const isIntlT20 = type === 't20i' || (type === 't20' && !!(COUNTRY_FLAGS[t1] || COUNTRY_FLAGS[t2]));
 
+  console.log('[cricket]', teams, '|', type, '→ ipl:', isIPL, 'odi/test:', isOdiOrTest, 't20i:', isIntlT20);
   return isIPL || isOdiOrTest || isIntlT20;
 }
 
