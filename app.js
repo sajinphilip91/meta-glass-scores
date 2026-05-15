@@ -253,13 +253,12 @@ function isIPLorInternational(m) {
   // IPL: either team is a known IPL franchise
   const isIPL = !!(IPL_TEAMS[t1] || IPL_TEAMS[t2]);
 
-  // International ODI or Test
-  const isOdiOrTest = type === 'odi' || type === 'test';
+  // International: at least one team must be a national team
+  const hasNationalTeam = !!(COUNTRY_FLAGS[t1] || COUNTRY_FLAGS[t2]);
+  const isOdiOrTest = (type === 'odi' || type === 'test') && hasNationalTeam;
+  const isIntlT20 = (type === 't20i' || type === 't20') && hasNationalTeam;
 
-  // T20I: explicit type, or a t20 between two national teams
-  const isIntlT20 = type === 't20i' || (type === 't20' && !!(COUNTRY_FLAGS[t1] || COUNTRY_FLAGS[t2]));
-
-  console.log('[cricket]', teams, '|', type, '→ ipl:', isIPL, 'odi/test:', isOdiOrTest, 't20i:', isIntlT20);
+  console.log('[cricket]', teams, '|', type, '→ ipl:', isIPL, 'national:', hasNationalTeam);
   return isIPL || isOdiOrTest || isIntlT20;
 }
 
