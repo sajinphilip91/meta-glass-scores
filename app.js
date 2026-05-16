@@ -465,13 +465,13 @@ function buildCricketCard(match, large) {
   if (s1 && !s2) {
     const balls = ballsRemaining(null);
     const suffix = balls ? ` · ${balls} balls` : '';
-    target = `🎯 ${short2} need ${s1.r + 1} to win${suffix}`;
+    target = `${short2} need ${s1.r + 1} to win${suffix}`;
   } else if (s1 && s2) {
     const needed = s1.r - s2.r + 1;
     if (needed > 0) {
       const balls = ballsRemaining(s2);
       const suffix = balls ? ` · ${balls} balls left` : '';
-      target = `🎯 ${short2} need ${needed} to win${suffix}`;
+      target = `${short2} need ${needed} to win${suffix}`;
     }
   }
 
@@ -479,20 +479,18 @@ function buildCricketCard(match, large) {
     <div class="cc-header">
       <div class="cc-live"><span class="live-dot"></span><span class="live-text">LIVE</span></div>
     </div>
-    <div class="cc-teams-row">
-      <div class="cc-team-left">
+    <div class="cc-body">
+      <div class="cc-team-col">
         ${logoHTML(t1)}
         <div class="cc-abbr">${short1}</div>
+        ${scoreHTML(s1)}
       </div>
       <div class="cc-vs-circle">VS</div>
-      <div class="cc-team-right">
-        <div class="cc-abbr">${short2}</div>
+      <div class="cc-team-col">
         ${logoHTML(t2)}
+        <div class="cc-abbr">${short2}</div>
+        ${scoreHTML(s2)}
       </div>
-    </div>
-    <div class="cc-scores-row">
-      <div class="cc-score-left">${scoreHTML(s1)}</div>
-      <div class="cc-score-right">${scoreHTML(s2)}</div>
     </div>
     ${target ? `<div class="cc-target-bar">${target}</div>` : ''}
   </div>`;

@@ -474,14 +474,19 @@ html, body {
 .cc-live { display: flex; align-items: center; gap: 6px; }
 .cc-over-pill { font-size: 10px; font-weight: 700; color: #9ca3af; letter-spacing: 1px; text-transform: uppercase; }
 
-.cc-teams-row {
+.cc-body {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 10px;
+  margin-bottom: 8px;
 }
-.cc-team-left  { display: flex; align-items: center; gap: 10px; }
-.cc-team-right { display: flex; align-items: center; gap: 10px; }
+.cc-team-col {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  flex: 1;
+}
 
 .cc-logo {
   width: 44px; height: 30px;
@@ -494,7 +499,7 @@ html, body {
 
 .cc-team-text { display: flex; flex-direction: column; gap: 2px; }
 .cc-team-text.right { align-items: flex-end; }
-.cc-abbr     { font-size: 20px; font-weight: 800; color: #fff; letter-spacing: 0.5px; line-height: 1; }
+.cc-abbr     { font-size: 20px; font-weight: 800; color: #9ca3af; letter-spacing: 0.5px; line-height: 1; }
 .cc-fullname { font-size: 10px; color: #6b7280; letter-spacing: 0.3px; }
 
 .cc-vs-circle {
@@ -510,7 +515,7 @@ html, body {
 .cc-score-left  { display: flex; flex-direction: column; }
 .cc-score-right { display: flex; flex-direction: column; align-items: flex-end; }
 
-.cc-runs  { font-size: 28px; font-weight: 700; color: #4a9eff; letter-spacing: -1px; line-height: 1; }
+.cc-runs  { font-size: 28px; font-weight: 700; color: #ffffff; letter-spacing: -1px; line-height: 1; }
 .cc-dashes{ font-size: 16px; color: #374151; letter-spacing: 5px; line-height: 1; padding-top: 5px; }
 .cc-label { font-size: 9px; color: #6b7280; letter-spacing: 1.5px; margin-top: 3px; text-transform: uppercase; }
 
