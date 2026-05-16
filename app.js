@@ -475,6 +475,7 @@ function cricketCardInnerHTML(match) {
     : `<div class="cc-dashes">— — —</div><div class="cc-label">YET TO BAT</div>`;
 
   const type = (match.matchType || '').toLowerCase();
+  const typeLabel = { t20: 'T20', t20i: 'T20I', odi: 'ODI', test: 'TEST' }[type] || (type ? type.toUpperCase() : '');
   const totalOvers = (type === 't20' || type === 't20i') ? 20 : type === 'odi' ? 50 : null;
 
   const ballsRemaining = (s) => {
@@ -502,6 +503,7 @@ function cricketCardInnerHTML(match) {
   return `
     <div class="cc-header">
       <div class="cc-live"><span class="live-dot"></span><span class="live-text">LIVE</span></div>
+      ${typeLabel ? `<div class="cc-match-type">${typeLabel}</div>` : ''}
     </div>
     <div class="cc-main">
       <div class="cc-left-col">
@@ -528,42 +530,11 @@ function buildCricketCard(match, large) {
 }
 
 function renderCricketDetailFull(full) {
-  const sc = full.scorecard || [];
-  const currentInning = sc[sc.length - 1] || {};
-  const batting  = currentInning.batting  || [];
-  const bowling  = currentInning.bowling  || [];
-
-  const currentBatsmen = batting.filter(b => b['dismissal-text'] === 'batting').slice(0, 2);
-  const recentBowlers  = bowling.slice().sort((a, b) => b.o - a.o).slice(0, 2);
-
-  const battingRows = currentBatsmen.map(b =>
-    `<div class="cd-stat-row">
-      <div class="cd-pname">● ${b.batsman.name}</div>
-      <div class="cd-pstat">${b.r} <span class="cd-pball">(${b.b})</span></div>
-    </div>`
-  ).join('');
-
-  const bowlingRows = recentBowlers.map(b =>
-    `<div class="cd-stat-row">
-      <div class="cd-pname">${b.bowler.name}</div>
-      <div class="cd-pstat">${b.o}-${b.m}-${b.r}-${b.w}</div>
-    </div>`
-  ).join('');
-
-  const venue = full.venue || '';
-
   document.getElementById('match-detail-content').innerHTML = `
     <div class="cd-wrap">
       <div class="match-card">
         <div class="inner">${cricketCardInnerHTML(full)}</div>
       </div>
-      ${battingRows || bowlingRows ? `
-      <div class="cd-stats-row">
-        <div class="cd-stats-col">${battingRows}</div>
-        <div class="cd-stats-divider"></div>
-        <div class="cd-stats-col">${bowlingRows}</div>
-      </div>` : ''}
-      ${venue ? `<div class="cd-venue">📍 ${venue}</div>` : ''}
     </div>`;
 }
 
