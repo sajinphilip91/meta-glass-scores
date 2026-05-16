@@ -202,22 +202,20 @@ function renderFootball(matches, nextMatch) {
 }
 
 // ── Football detail — unified card with goalscorers inside ─────
-function openFootballDetail(match) {
+function renderFootballDetailCard(match, goals) {
   const home = match.homeTeam;
   const away = match.awayTeam;
-  const goals = match.goals || [];
   const homeGoals = goals.filter(g => g.team?.id === home.id);
   const awayGoals = goals.filter(g => g.team?.id === away.id);
 
   const scorerHTML = (goalList) => goalList.map(g => {
     const name = g.scorer?.name || '';
-    const min = g.minute ? g.minute + "'" + (g.injuryTime ? ' +' + g.injuryTime : '') : '';
+    const min = g.minute != null ? g.minute + "'" + (g.injuryTime ? ' +' + g.injuryTime : '') : '';
     return `<div class="scorer-name">${name}<span class="minute"> ${min}</span></div>`;
   }).join('');
 
   const hasGoals = goals.length > 0;
 
-  document.getElementById('detail-competition-header').textContent = match.competition?.name || 'Football';
   document.getElementById('match-detail-content').innerHTML = `
     <div class="detail-wrap">
       <div class="detail-unified-card">
@@ -228,12 +226,26 @@ function openFootballDetail(match) {
           <div class="detail-scorers">
             <div class="scorer-col">${scorerHTML(homeGoals)}</div>
             <div class="scorer-col right">${scorerHTML(awayGoals)}</div>
-          </div>` : ''}
+          </div>` : '<div class="detail-divider"></div><div class="scorer-loading">No goals yet</div>'}
         </div>
       </div>
     </div>`;
+}
 
+async function openFootballDetail(match) {
+  document.getElementById('detail-competition-header').textContent = match.competition?.name || 'Football';
+  renderFootballDetailCard(match, match.goals || []);
   showScreen('match-detail', 'football');
+
+  if (!match.id) return;
+  try {
+    const res = await fetch(`/api/football-match?id=${match.id}`);
+    if (!res.ok) return;
+    const full = await res.json();
+    if (state.currentScreen === 'match-detail') {
+      renderFootballDetailCard(full, full.goals || []);
+    }
+  } catch { }
 }
 
 // ── Cricket ────────────────────────────────────────────────────
