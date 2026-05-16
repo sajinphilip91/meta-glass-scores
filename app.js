@@ -435,8 +435,7 @@ function buildCricketCard(match, large) {
   const s1 = scores.find(s => (s.inning || '').toLowerCase().startsWith(t1.toLowerCase()));
   const s2 = scores.find(s => (s.inning || '').toLowerCase().startsWith(t2.toLowerCase()));
 
-  const logoHTML = (info, teamName) => {
-    if (info.img) return `<img class="cc-logo" src="${info.img}" alt="" onerror="this.style.display='none'">`;
+  const logoHTML = (teamName) => {
     const key = teamName.toLowerCase();
     const ipl = IPL_TEAMS[key];
     if (ipl) return `<div class="cc-logo cc-badge" style="background:${ipl.bg};color:${ipl.color}">${ipl.abbr}</div>`;
@@ -449,44 +448,51 @@ function buildCricketCard(match, large) {
     ? `<div class="cc-runs">${s.r}/${s.w}</div><div class="cc-label">${s.o} OVERS</div>`
     : `<div class="cc-dashes">— — —</div><div class="cc-label">YET TO BAT</div>`;
 
-  const battingScore = s1 && !s2 ? s1 : s2 || s1;
-  const currentOver = battingScore ? ordinalOver(battingScore.o) : null;
+  const type = (match.matchType || '').toLowerCase();
+  const totalOvers = (type === 't20' || type === 't20i') ? 20 : type === 'odi' ? 50 : null;
+
+  const ballsRemaining = (s) => {
+    if (!totalOvers) return null;
+    if (!s) return totalOvers * 6;
+    const o = parseFloat(s.o) || 0;
+    const bowled = Math.floor(o) * 6 + Math.round((o % 1) * 10);
+    return Math.max(0, totalOvers * 6 - bowled);
+  };
 
   let target = null;
   if (s1 && !s2) {
-    target = `${short2} need ${s1.r + 1} to win`;
+    const balls = ballsRemaining(null);
+    const suffix = balls ? ` · ${balls} balls` : '';
+    target = `🎯 ${short2} need ${s1.r + 1} to win${suffix}`;
   } else if (s1 && s2) {
     const needed = s1.r - s2.r + 1;
-    if (needed > 0) target = `${short2} need ${needed} more to win`;
+    if (needed > 0) {
+      const balls = ballsRemaining(s2);
+      const suffix = balls ? ` · ${balls} balls left` : '';
+      target = `🎯 ${short2} need ${needed} to win${suffix}`;
+    }
   }
 
   card.innerHTML = `<div class="inner">
     <div class="cc-header">
       <div class="cc-live"><span class="live-dot"></span><span class="live-text">LIVE</span></div>
-      ${currentOver ? `<div class="cc-over-pill">${currentOver}</div>` : ''}
     </div>
     <div class="cc-teams-row">
       <div class="cc-team-left">
-        ${logoHTML(info1, t1)}
-        <div class="cc-team-text">
-          <div class="cc-abbr">${short1}</div>
-          <div class="cc-fullname">${t1}</div>
-        </div>
+        ${logoHTML(t1)}
+        <div class="cc-abbr">${short1}</div>
       </div>
       <div class="cc-vs-circle">VS</div>
       <div class="cc-team-right">
-        <div class="cc-team-text right">
-          <div class="cc-abbr">${short2}</div>
-          <div class="cc-fullname">${t2}</div>
-        </div>
-        ${logoHTML(info2, t2)}
+        <div class="cc-abbr">${short2}</div>
+        ${logoHTML(t2)}
       </div>
     </div>
     <div class="cc-scores-row">
       <div class="cc-score-left">${scoreHTML(s1)}</div>
       <div class="cc-score-right">${scoreHTML(s2)}</div>
     </div>
-    ${target ? `<div class="cc-target-bar">🎯 ${target}</div>` : ''}
+    ${target ? `<div class="cc-target-bar">${target}</div>` : ''}
   </div>`;
 
   card.addEventListener('click', () => openCricketDetail(match));

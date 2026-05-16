@@ -481,7 +481,7 @@ html, body {
   margin-bottom: 10px;
 }
 .cc-team-left  { display: flex; align-items: center; gap: 10px; }
-.cc-team-right { display: flex; align-items: center; gap: 10px; flex-direction: row-reverse; }
+.cc-team-right { display: flex; align-items: center; gap: 10px; }
 
 .cc-logo {
   width: 44px; height: 44px;
@@ -490,7 +490,7 @@ html, body {
   flex-shrink: 0;
 }
 .cc-badge { display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 13px; font-family: inherit; }
-.cc-flag  { object-fit: cover; }
+.cc-flag  { object-fit: cover; object-position: center; }
 
 .cc-team-text { display: flex; flex-direction: column; gap: 2px; }
 .cc-team-text.right { align-items: flex-end; }
