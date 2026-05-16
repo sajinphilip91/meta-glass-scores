@@ -594,5 +594,4 @@ document.getElementById('btn-back-detail').addEventListener('click', goBack);
 
 // ── Boot ───────────────────────────────────────────────────────
 showScreen('home');
-syncToggle();
-if (state.defaultSport) selectSport(state.defaultSport);
+selectSport(state.defaultSport || 'football');
