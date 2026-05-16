@@ -284,7 +284,6 @@ function isIPLorInternational(m) {
   const isOdiOrTest = (type === 'odi' || type === 'test') && hasNationalTeam;
   const isIntlT20 = (type === 't20i' || type === 't20') && hasNationalTeam;
 
-  console.log('[cricket]', teams, '|', type, '→ ipl:', isIPL, 'national:', hasNationalTeam);
   return isIPL || isOdiOrTest || isIntlT20;
 }
 
