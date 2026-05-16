@@ -2,7 +2,6 @@ const state = {
   currentScreen: 'home',
   previousScreen: null,
   currentSport: null,
-  pendingDefaultSport: null,
   footballInterval: null,
   cricketInterval: null,
   alwaysOn: localStorage.getItem('alwaysOn') === 'true',
@@ -20,8 +19,6 @@ function showScreen(id, from) {
 }
 
 function goBack() {
-  const dialog = document.getElementById('dialog-default');
-  if (!dialog.classList.contains('hidden')) { dialog.classList.add('hidden'); return; }
   if (state.currentScreen === 'settings') showScreen(state.previousScreen);
   else if (state.currentScreen === 'match-detail') showScreen(state.currentSport);
   else showScreen('home');
@@ -30,6 +27,10 @@ function goBack() {
 // ── Sport selection ────────────────────────────────────────────
 function selectSport(sport) {
   state.currentSport = sport;
+  state.defaultSport = sport;
+  localStorage.setItem('defaultSport', sport);
+  syncToggle();
+  syncSettings();
   if (sport === 'football') {
     showScreen('football');
     loadFootball();
@@ -41,13 +42,11 @@ function selectSport(sport) {
     clearInterval(state.cricketInterval);
     state.cricketInterval = setInterval(loadCricket, 900_000);
   }
-  if (!state.defaultSport) {
-    state.pendingDefaultSport = sport;
-    setTimeout(() => {
-      document.getElementById('dialog-default').classList.remove('hidden');
-      document.getElementById('btn-set-default').focus();
-    }, 1200);
-  }
+}
+
+function syncToggle() {
+  document.getElementById('btn-football').classList.toggle('active', state.defaultSport === 'football');
+  document.getElementById('btn-cricket').classList.toggle('active', state.defaultSport === 'cricket');
 }
 
 // ── Match card builder (shared by list + single + detail) ──────
@@ -625,8 +624,7 @@ function syncSettings() {
 
 // ── D-pad ──────────────────────────────────────────────────────
 document.addEventListener('keydown', e => {
-  const dialogOpen = !document.getElementById('dialog-default').classList.contains('hidden');
-  const scope = dialogOpen ? '#dialog-default' : '#screen-' + state.currentScreen;
+  const scope = '#screen-' + state.currentScreen;
   const focusables = Array.from(document.querySelectorAll(scope + ' .focusable'));
   const idx = focusables.indexOf(document.activeElement);
   switch (e.key) {
@@ -653,11 +651,10 @@ document.getElementById('btn-settings-home').addEventListener('click', () => sho
 document.getElementById('btn-settings-football').addEventListener('click', () => showScreen('settings', 'football'));
 document.getElementById('btn-settings-cricket').addEventListener('click', () => showScreen('settings', 'cricket'));
 document.getElementById('setting-always-on').addEventListener('click', () => { state.alwaysOn = !state.alwaysOn; localStorage.setItem('alwaysOn', state.alwaysOn); syncSettings(); });
-document.getElementById('setting-clear-default').addEventListener('click', () => { state.defaultSport = null; localStorage.removeItem('defaultSport'); syncSettings(); });
-document.getElementById('btn-set-default').addEventListener('click', () => { state.defaultSport = state.pendingDefaultSport; localStorage.setItem('defaultSport', state.defaultSport); document.getElementById('dialog-default').classList.add('hidden'); syncSettings(); });
-document.getElementById('btn-skip-default').addEventListener('click', () => document.getElementById('dialog-default').classList.add('hidden'));
+document.getElementById('setting-clear-default').addEventListener('click', () => { state.defaultSport = null; localStorage.removeItem('defaultSport'); syncToggle(); syncSettings(); });
 
 // ── Boot ───────────────────────────────────────────────────────
 syncSettings();
+syncToggle();
 if (state.defaultSport) selectSport(state.defaultSport);
 else showScreen('home');

@@ -21,28 +21,10 @@
         <button class="icon-btn focusable" id="btn-settings-home" aria-label="Settings">⚙</button>
       </div>
       <div class="sport-selector">
-        <button class="sport-btn focusable" id="btn-football">
-          <div class="inner">
-            <div class="sport-thumb football-thumb">
-              <img src="Images/football.png" class="thumb-img" alt="Football">
-            </div>
-            <div class="sport-info">
-              <div class="sport-name"><span class="sport-bold">Football</span> Score</div>
-              <div class="sport-sub">World Cup · La Liga</div>
-            </div>
-          </div>
-        </button>
-        <button class="sport-btn focusable" id="btn-cricket">
-          <div class="inner">
-            <div class="sport-thumb cricket-thumb">
-              <img src="Images/cricket.png" class="thumb-img" alt="Cricket">
-            </div>
-            <div class="sport-info">
-              <div class="sport-name"><span class="sport-bold">Cricket</span> Score</div>
-              <div class="sport-sub">IPL · International</div>
-            </div>
-          </div>
-        </button>
+        <div class="sport-toggle">
+          <button class="toggle-opt focusable" id="btn-football" tabindex="0">Football</button>
+          <button class="toggle-opt focusable" id="btn-cricket" tabindex="0">Cricket</button>
+        </div>
       </div>
     </div>
 
@@ -98,16 +80,6 @@
       </div>
     </div>
 
-    <!-- Default Sport Dialog -->
-    <div id="dialog-default" class="dialog hidden">
-      <div class="dialog-box">
-        <p class="dialog-text">Set as your default sport?</p>
-        <div class="dialog-buttons">
-          <button class="dialog-btn focusable" id="btn-set-default">Yes</button>
-          <button class="dialog-btn focusable" id="btn-skip-default">No</button>
-        </div>
-      </div>
-    </div>
 
   </div>
   <script src="app.js"></script>
