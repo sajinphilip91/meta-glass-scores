@@ -409,11 +409,15 @@ html, body {
 }
 .cd-wrap::-webkit-scrollbar { display: none; }
 
+.cd-stats-divider-h {
+  height: 1px;
+  background: rgba(255,255,255,0.08);
+  margin: 10px 0;
+}
 .cd-stats-row {
   display: flex;
   align-items: flex-start;
   gap: 0;
-  padding: 0 8px;
 }
 .cd-stats-col {
   flex: 1;
@@ -447,7 +451,8 @@ html, body {
 .cc-header {
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: center;
+  gap: 10px;
   margin-bottom: 10px;
 }
 .cc-match-type { font-size: 10px; font-weight: 700; color: #9ca3af; letter-spacing: 1.5px; text-transform: uppercase; }
