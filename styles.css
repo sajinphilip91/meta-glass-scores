@@ -484,12 +484,12 @@ html, body {
 .cc-team-right { display: flex; align-items: center; gap: 10px; }
 
 .cc-logo {
-  width: 44px; height: 44px;
-  border-radius: 50%;
+  width: 44px; height: 30px;
+  border-radius: 4px;
   object-fit: cover;
   flex-shrink: 0;
 }
-.cc-badge { display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 13px; font-family: inherit; }
+.cc-badge { display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 13px; font-family: inherit; width: 44px; height: 30px; border-radius: 4px; }
 .cc-flag  { object-fit: cover; object-position: center; }
 
 .cc-team-text { display: flex; flex-direction: column; gap: 2px; }
@@ -519,13 +519,11 @@ html, body {
 .cricket-large .cc-abbr  { font-size: 24px; }
 
 .cc-target-bar {
-  background: rgba(74, 158, 255, 0.08);
-  border: 1px solid rgba(74, 158, 255, 0.2);
-  border-radius: 8px;
-  padding: 6px 12px;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  padding-top: 8px;
   font-size: 11px;
   font-weight: 600;
-  color: #4a9eff;
+  color: #E4E6EB;
   text-align: center;
   letter-spacing: 0.3px;
 }

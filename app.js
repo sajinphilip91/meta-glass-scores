@@ -375,6 +375,7 @@ const COUNTRY_FLAGS = {
   'bangladesh': 'bd', 'zimbabwe': 'zw', 'afghanistan': 'af', 'ireland': 'ie',
   'netherlands': 'nl', 'nepal': 'np', 'usa': 'us', 'canada': 'ca',
   'uae': 'ae', 'oman': 'om', 'namibia': 'na', 'scotland': 'gb',
+  'united states of america': 'us', 'united states': 'us',
 };
 
 function getCricketTeamVisual(teamName, sizeClass) {
