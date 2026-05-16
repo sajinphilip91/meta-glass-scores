@@ -452,14 +452,11 @@ function buildCricketCard(match, large) {
   return card;
 }
 
-function openCricketDetail(match) {
-  const matchName = match.name || (match.teams || []).join(' vs ');
+async function openCricketDetail(match) {
   const type = (match.matchType || 'Cricket').toUpperCase();
   document.getElementById('detail-competition-header').textContent = type;
 
   const scores = match.score || [];
-  const hasScores = scores.length > 0;
-
   const inningRows = scores.map(s => `
     <div class="cricket-inning-row">
       <div class="cricket-inning-label">${shortInning(s.inning)}</div>
@@ -475,21 +472,33 @@ function openCricketDetail(match) {
             <span class="live-dot"></span>
             <span class="live-text">LIVE · ${type}</span>
           </div>
-          <div class="cricket-detail-title">${matchName}</div>
-          ${hasScores ? `
+          ${scores.length ? `
             <div class="detail-divider"></div>
-            <div class="cricket-detail-innings">
-              ${inningRows}
-            </div>
+            <div class="cricket-detail-innings">${inningRows}</div>
           ` : `
             <div class="detail-divider"></div>
-            <div class="cricket-no-score" style="text-align:center;padding:16px 0">Innings yet to begin</div>
+            <div class="scorer-loading">Innings yet to begin</div>
           `}
+          <div id="cricket-scorecard-section"></div>
         </div>
       </div>
     </div>`;
 
   showScreen('match-detail', 'cricket');
+
+  if (!match.id) return;
+  try {
+    const res = await fetch(`/api/cricket-scorecard?id=${match.id}`);
+    if (!res.ok) return;
+    const data = await res.json();
+    console.log('[scorecard raw]', JSON.stringify(data, null, 2));
+    const section = document.getElementById('cricket-scorecard-section');
+    if (section && state.currentScreen === 'match-detail') {
+      section.innerHTML = `<div class="scorer-loading" style="font-size:10px;color:#4ade80">Scorecard loaded — check console</div>`;
+    }
+  } catch (e) {
+    console.error('[scorecard error]', e);
+  }
 }
 
 // ── Helpers ────────────────────────────────────────────────────
