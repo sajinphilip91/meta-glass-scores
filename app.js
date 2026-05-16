@@ -4,7 +4,6 @@ const state = {
   currentSport: null,
   footballInterval: null,
   cricketInterval: null,
-  alwaysOn: localStorage.getItem('alwaysOn') === 'true',
   defaultSport: localStorage.getItem('defaultSport') || null,
 };
 
@@ -28,7 +27,6 @@ function selectSport(sport) {
   state.defaultSport = sport;
   localStorage.setItem('defaultSport', sport);
   syncToggle();
-  syncSettings();
   clearInterval(state.footballInterval);
   clearInterval(state.cricketInterval);
   if (sport === 'football') {
@@ -571,15 +569,6 @@ function shortInning(inning) {
   return inning.replace(/\s+inning\s*\d*/i, '').trim();
 }
 
-// ── Settings ───────────────────────────────────────────────────
-function syncSettings() {
-  const t = document.getElementById('toggle-always-on');
-  t.textContent = state.alwaysOn ? 'ON' : 'OFF';
-  t.className = 'setting-toggle' + (state.alwaysOn ? ' on' : '');
-  document.getElementById('value-default-sport').textContent =
-    state.defaultSport ? state.defaultSport[0].toUpperCase() + state.defaultSport.slice(1) : 'None';
-}
-
 // ── D-pad ──────────────────────────────────────────────────────
 document.addEventListener('keydown', e => {
   const scope = '#screen-' + state.currentScreen;
@@ -602,13 +591,8 @@ document.addEventListener('keydown', e => {
 document.getElementById('btn-football').addEventListener('click', () => selectSport('football'));
 document.getElementById('btn-cricket').addEventListener('click', () => selectSport('cricket'));
 document.getElementById('btn-back-detail').addEventListener('click', goBack);
-document.getElementById('btn-back-settings').addEventListener('click', goBack);
-document.getElementById('btn-settings-home').addEventListener('click', () => showScreen('settings', 'home'));
-document.getElementById('setting-always-on').addEventListener('click', () => { state.alwaysOn = !state.alwaysOn; localStorage.setItem('alwaysOn', state.alwaysOn); syncSettings(); });
-document.getElementById('setting-clear-default').addEventListener('click', () => { state.defaultSport = null; localStorage.removeItem('defaultSport'); syncToggle(); syncSettings(); });
 
 // ── Boot ───────────────────────────────────────────────────────
-syncSettings();
 showScreen('home');
 syncToggle();
 if (state.defaultSport) selectSport(state.defaultSport);

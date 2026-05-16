@@ -654,30 +654,3 @@ html, body {
 /* ── Loading ── */
 .loading { flex: 1; display: flex; align-items: center; justify-content: center; font-size: 11px; color: #6b7280; letter-spacing: 2px; text-transform: uppercase; }
 
-/* ── Settings ── */
-.settings-list { display: flex; flex-direction: column; gap: 8px; padding: 4px 8px; }
-.setting-item {
-  min-height: 88px;
-  background: #111111;
-  border: 2px solid transparent;
-  border-radius: 16px;
-  padding: 0 24px;
-  display: flex; align-items: center; justify-content: space-between;
-  cursor: pointer;
-  transition: border-color 300ms cubic-bezier(0.4,0.04,0.5,1);
-}
-.setting-item:focus { outline: none; border-color: rgba(255,255,255,0.4); }
-.setting-label { font-size: 16px; font-weight: 600; }
-.setting-toggle { font-size: 13px; font-weight: 700; color: #6b7280; letter-spacing: 1px; }
-.setting-toggle.on { color: #4ade80; }
-.setting-value { font-size: 13px; color: #6b7280; }
-
-/* ── Dialog ── */
-.dialog { position: absolute; inset: 0; background: rgba(0,0,0,0.8); display: flex; align-items: center; justify-content: center; z-index: 200; }
-.dialog.hidden { display: none; }
-.dialog-box { background: #1a1a1a; border: 1px solid rgba(255,255,255,0.08); border-radius: 20px; padding: 36px 32px; text-align: center; display: flex; flex-direction: column; gap: 28px; min-width: 300px; }
-.dialog-text { font-size: 17px; font-weight: 600; }
-.dialog-buttons { display: flex; gap: 12px; justify-content: center; }
-.dialog-btn { background: #2a2a2a; border: 2px solid transparent; border-radius: 12px; color: #FFFFFF; font-size: 15px; font-weight: 600; padding: 14px 36px; cursor: pointer; transition: border-color 300ms cubic-bezier(0.4,0.04,0.5,1); }
-.dialog-btn:focus { outline: none; border-color: rgba(255,255,255,0.5); }
-.dialog-btn:active { transform: scale(0.95); }
