@@ -321,6 +321,34 @@ const DUMMY_CRICKET_MATCHES = [
     ],
   },
 ];
+const DUMMY_CRICKET_DETAIL = {
+  teams: ['Mumbai Indians', 'Chennai Super Kings'],
+  teamInfo: [
+    { name: 'Mumbai Indians',      shortname: 'MI',  img: '' },
+    { name: 'Chennai Super Kings', shortname: 'CSK', img: '' },
+  ],
+  score: [
+    { inning: 'Mumbai Indians Inning 1',      r: 186, w: 5, o: 20   },
+    { inning: 'Chennai Super Kings Inning 1', r: 142, w: 7, o: 17.3 },
+  ],
+  scorecard: [{
+    inning: 'Chennai Super Kings Inning 1',
+    batting: [
+      { batsman: { name: 'MS Dhoni' },        r: 34, b: 28, 'dismissal-text': 'batting' },
+      { batsman: { name: 'Ravindra Jadeja' }, r: 18, b: 12, 'dismissal-text': 'batting' },
+      { batsman: { name: 'Ruturaj Gaikwad' }, r: 58, b: 41, 'dismissal-text': 'caught'  },
+      { batsman: { name: 'Devon Conway' },    r: 22, b: 19, 'dismissal-text': 'bowled'  },
+    ],
+    bowling: [
+      { bowler: { name: 'J. Bumrah' },   o: 4,   m: 0, r: 28, w: 2 },
+      { bowler: { name: 'H. Pandya' },   o: 3.3, m: 0, r: 31, w: 1 },
+      { bowler: { name: 'J. Archer' },   o: 4,   m: 0, r: 38, w: 2 },
+      { bowler: { name: 'G. Arshdeep' }, o: 4,   m: 0, r: 32, w: 1 },
+    ],
+  }],
+  status: 'Chennai Super Kings need 45 runs from 15 balls',
+  venue: 'Wankhede Stadium, Mumbai',
+};
 // ── END DEMO ───────────────────────────────────────────────────
 
 function renderCricket(matches) {
@@ -580,7 +608,7 @@ async function openCricketDetail(match) {
   document.getElementById('match-detail-content').innerHTML = '<div class="loading">Loading…</div>';
   showScreen('match-detail', 'cricket');
 
-  if (!match.id) return;
+  if (!match.id) { renderCricketDetailFull(DUMMY_CRICKET_DETAIL); return; }
   try {
     const res = await fetch(`/api/cricket-scorecard?id=${match.id}`);
     if (!res.ok) throw new Error();
