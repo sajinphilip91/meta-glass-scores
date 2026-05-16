@@ -19,9 +19,7 @@ function showScreen(id, from) {
 }
 
 function goBack() {
-  if (state.currentScreen === 'settings') showScreen(state.previousScreen);
-  else if (state.currentScreen === 'match-detail') showScreen(state.currentSport);
-  else showScreen('home');
+  showScreen('home');
 }
 
 // ── Sport selection ────────────────────────────────────────────
@@ -31,15 +29,13 @@ function selectSport(sport) {
   localStorage.setItem('defaultSport', sport);
   syncToggle();
   syncSettings();
+  clearInterval(state.footballInterval);
+  clearInterval(state.cricketInterval);
   if (sport === 'football') {
-    showScreen('football');
     loadFootball();
-    clearInterval(state.footballInterval);
     state.footballInterval = setInterval(loadFootball, 60_000);
   } else {
-    showScreen('cricket');
     loadCricket();
-    clearInterval(state.cricketInterval);
     state.cricketInterval = setInterval(loadCricket, 900_000);
   }
 }
@@ -96,7 +92,7 @@ function buildMatchCard(match, scoreClass, crestClass) {
 
 // ── Football ───────────────────────────────────────────────────
 async function loadFootball() {
-  const el = document.getElementById('football-content');
+  const el = document.getElementById('home-content');
   el.innerHTML = '<div class="loading">Loading…</div>';
   try {
     const res = await fetch('/api/football');
@@ -144,7 +140,7 @@ const DUMMY_MATCHES = [
 // ── END DEMO ────────────────────────────────────────────────────
 
 function renderFootball(matches, nextMatch) {
-  const el = document.getElementById('football-content');
+  const el = document.getElementById('home-content');
 
   // Use dummy data when no live matches (remove DUMMY_MATCHES line below when going live)
   if (!matches.length) matches = DUMMY_MATCHES;
@@ -161,31 +157,8 @@ function renderFootball(matches, nextMatch) {
     return;
   }
 
-  // ONE GAME — card anchored to bottom, big score
-  if (matches.length === 1) {
-    const match = matches[0];
-    const card = document.createElement('div');
-    card.className = 'match-card focusable';
-    card.tabIndex = 0;
-    card.innerHTML = `<div class="inner">${buildMatchCard(match, 'score-full', 'crest-lg')}</div>`;
-
-    const wrap = document.createElement('div');
-    wrap.className = 'single-match-wrap';
-    wrap.appendChild(card);
-
-    el.innerHTML = '';
-    el.appendChild(wrap);
-
-    card.addEventListener('click', () => openFootballDetail(match));
-    card.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openFootballDetail(match); } });
-    card.focus();
-    return;
-  }
-
-  // MULTIPLE GAMES — scrollable list
   const list = document.createElement('div');
   list.className = 'match-list';
-
   matches.forEach(match => {
     const card = document.createElement('div');
     card.className = 'match-card focusable';
@@ -195,7 +168,6 @@ function renderFootball(matches, nextMatch) {
     card.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openFootballDetail(match); } });
     list.appendChild(card);
   });
-
   el.innerHTML = '';
   el.appendChild(list);
 }
@@ -249,7 +221,7 @@ async function openFootballDetail(match) {
 
 // ── Cricket ────────────────────────────────────────────────────
 async function loadCricket() {
-  const el = document.getElementById('cricket-content');
+  const el = document.getElementById('home-content');
   el.innerHTML = '<div class="loading">Loading…</div>';
   try {
     const res = await fetch('/api/cricket');
@@ -351,7 +323,7 @@ const DUMMY_CRICKET_DETAIL = {
 // ── END DEMO ───────────────────────────────────────────────────
 
 function renderCricket(matches) {
-  const el = document.getElementById('cricket-content');
+  const el = document.getElementById('home-content');
   let live = matches.filter(m => !m.matchEnded && isIPLorInternational(m));
 
   // Use dummy data when no live matches (remove DUMMY_CRICKET_MATCHES line below when going live)
@@ -362,20 +334,6 @@ function renderCricket(matches) {
     return;
   }
 
-  // ONE GAME
-  if (live.length === 1) {
-    const match = live[0];
-    const card = buildCricketCard(match, true);
-    const wrap = document.createElement('div');
-    wrap.className = 'single-match-wrap';
-    wrap.appendChild(card);
-    el.innerHTML = '';
-    el.appendChild(wrap);
-    card.focus();
-    return;
-  }
-
-  // MULTIPLE
   const list = document.createElement('div');
   list.className = 'match-list';
   live.forEach(match => list.appendChild(buildCricketCard(match, false)));
@@ -643,18 +601,14 @@ document.addEventListener('keydown', e => {
 // ── Wire buttons ───────────────────────────────────────────────
 document.getElementById('btn-football').addEventListener('click', () => selectSport('football'));
 document.getElementById('btn-cricket').addEventListener('click', () => selectSport('cricket'));
-document.getElementById('btn-back-football').addEventListener('click', goBack);
-document.getElementById('btn-back-cricket').addEventListener('click', goBack);
 document.getElementById('btn-back-detail').addEventListener('click', goBack);
 document.getElementById('btn-back-settings').addEventListener('click', goBack);
 document.getElementById('btn-settings-home').addEventListener('click', () => showScreen('settings', 'home'));
-document.getElementById('btn-settings-football').addEventListener('click', () => showScreen('settings', 'football'));
-document.getElementById('btn-settings-cricket').addEventListener('click', () => showScreen('settings', 'cricket'));
 document.getElementById('setting-always-on').addEventListener('click', () => { state.alwaysOn = !state.alwaysOn; localStorage.setItem('alwaysOn', state.alwaysOn); syncSettings(); });
 document.getElementById('setting-clear-default').addEventListener('click', () => { state.defaultSport = null; localStorage.removeItem('defaultSport'); syncToggle(); syncSettings(); });
 
 // ── Boot ───────────────────────────────────────────────────────
 syncSettings();
+showScreen('home');
 syncToggle();
 if (state.defaultSport) selectSport(state.defaultSport);
-else showScreen('home');
