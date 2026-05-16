@@ -452,52 +452,106 @@ function buildCricketCard(match, large) {
   return card;
 }
 
+function renderCricketDetailFull(full) {
+  const teams  = full.teams || [];
+  const t1name = teams[0] || '';
+  const t2name = teams[1] || '';
+  const info   = full.teamInfo || [];
+  const t1info = info.find(t => t.name === t1name) || {};
+  const t2info = info.find(t => t.name === t2name) || {};
+
+  const scores = full.score || [];
+  const s1 = scores.find(s => (s.inning || '').startsWith(t1name));
+  const s2 = scores.find(s => (s.inning || '').startsWith(t2name));
+
+  const sc = full.scorecard || [];
+  const currentInning = sc[sc.length - 1] || {};
+  const batting  = currentInning.batting  || [];
+  const bowling  = currentInning.bowling  || [];
+  const inningLabel = (currentInning.inning || '').replace(/\s+inning\s*\d*/i, '').trim();
+  const bowlingTeam = inningLabel === t1name ? t2name : t1name;
+
+  const currentBatsmen = batting.filter(b => b['dismissal-text'] === 'batting');
+  const topBowlers = bowling.slice().sort((a, b) => b.o - a.o).slice(0, 3);
+
+  const logoHTML = info => info.img
+    ? `<img class="cd-logo" src="${info.img}" alt="" onerror="this.style.display='none'">`
+    : `<div class="cd-logo cd-logo-badge">${(info.name||'?').substring(0,2).toUpperCase()}</div>`;
+
+  const scoreBlock = (s, align) => s
+    ? `<div class="cd-score-block ${align}"><div class="cd-runs">${s.r}/${s.w}</div><div class="cd-overs">${s.o} ov</div></div>`
+    : `<div class="cd-score-block ${align}"><div class="cd-yet">Yet to bat</div></div>`;
+
+  const battingRows = currentBatsmen.map(b =>
+    `<div class="cd-row"><div class="cd-pname">● ${b.batsman.name}</div><div class="cd-pstat">${b.r} <span class="cd-pball">(${b.b})</span></div></div>`
+  ).join('');
+
+  const bowlingRows = topBowlers.map(b =>
+    `<div class="cd-row"><div class="cd-pname">${b.bowler.name}</div><div class="cd-pstat">${b.o}-${b.m}-${b.r}-${b.w}</div></div>`
+  ).join('');
+
+  const venue = full.venue || '';
+  const status = full.status || '';
+
+  document.getElementById('match-detail-content').innerHTML = `
+    <div class="cd-wrap">
+      <div class="cd-teams-row">
+        <div class="cd-team-col">
+          ${logoHTML(t1info)}
+          <div class="cd-short">${t1info.shortname || t1name.substring(0,3).toUpperCase()}</div>
+        </div>
+        <div class="cd-vs">vs</div>
+        <div class="cd-team-col right">
+          <div class="cd-short">${t2info.shortname || t2name.substring(0,3).toUpperCase()}</div>
+          ${logoHTML(t2info)}
+        </div>
+      </div>
+
+      <div class="cd-scores-row">
+        ${scoreBlock(s1, '')}
+        ${scoreBlock(s2, 'right')}
+      </div>
+
+      ${status ? `<div class="cd-status">${status}</div>` : ''}
+
+      ${battingRows ? `
+        <div class="cd-divider"></div>
+        <div class="cd-section-title">${inningLabel} BATTING</div>
+        ${battingRows}` : ''}
+
+      ${bowlingRows ? `
+        <div class="cd-divider"></div>
+        <div class="cd-section-title">${bowlingTeam} BOWLING</div>
+        ${bowlingRows}` : ''}
+
+      ${venue ? `<div class="cd-divider"></div><div class="cd-venue">📍 ${venue}</div>` : ''}
+    </div>`;
+}
+
 async function openCricketDetail(match) {
   const type = (match.matchType || 'Cricket').toUpperCase();
   document.getElementById('detail-competition-header').textContent = type;
-
-  const scores = match.score || [];
-  const inningRows = scores.map(s => `
-    <div class="cricket-inning-row">
-      <div class="cricket-inning-label">${shortInning(s.inning)}</div>
-      <div class="cricket-inning-score">${s.r}/${s.w}</div>
-      <div class="cricket-inning-overs">${s.o} overs</div>
-    </div>`).join('');
-
-  document.getElementById('match-detail-content').innerHTML = `
-    <div class="detail-wrap">
-      <div class="detail-unified-card">
-        <div class="inner">
-          <div class="live-bar">
-            <span class="live-dot"></span>
-            <span class="live-text">LIVE · ${type}</span>
-          </div>
-          ${scores.length ? `
-            <div class="detail-divider"></div>
-            <div class="cricket-detail-innings">${inningRows}</div>
-          ` : `
-            <div class="detail-divider"></div>
-            <div class="scorer-loading">Innings yet to begin</div>
-          `}
-          <div id="cricket-scorecard-section"></div>
-        </div>
-      </div>
-    </div>`;
-
+  document.getElementById('match-detail-content').innerHTML = '<div class="loading">Loading…</div>';
   showScreen('match-detail', 'cricket');
 
   if (!match.id) return;
   try {
     const res = await fetch(`/api/cricket-scorecard?id=${match.id}`);
-    if (!res.ok) return;
+    if (!res.ok) throw new Error();
     const data = await res.json();
-    console.log('[scorecard raw]', JSON.stringify(data, null, 2));
-    const section = document.getElementById('cricket-scorecard-section');
-    if (section && state.currentScreen === 'match-detail') {
-      section.innerHTML = `<div class="scorer-loading" style="font-size:10px;color:#4ade80">Scorecard loaded — check console</div>`;
+    if (state.currentScreen === 'match-detail') {
+      renderCricketDetailFull(data.data || {});
     }
-  } catch (e) {
-    console.error('[scorecard error]', e);
+  } catch {
+    const scores = match.score || [];
+    document.getElementById('match-detail-content').innerHTML = `
+      <div class="cd-wrap">
+        ${scores.map(s => `
+          <div class="cd-row">
+            <div class="cd-pname">${shortInning(s.inning)}</div>
+            <div class="cd-pstat">${s.r}/${s.w} <span class="cd-pball">${s.o} ov</span></div>
+          </div>`).join('')}
+      </div>`;
   }
 }
 
