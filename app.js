@@ -446,11 +446,7 @@ function ordinalOver(overs) {
   return `${n}${suffix} OVER`;
 }
 
-function buildCricketCard(match, large) {
-  const card = document.createElement('div');
-  card.className = `match-card focusable${large ? ' cricket-large' : ''}`;
-  card.tabIndex = 0;
-
+function cricketCardInnerHTML(match) {
   const teams    = match.teams    || [];
   const teamInfo = match.teamInfo || [];
   const t1 = teams[0] || '';
@@ -503,7 +499,7 @@ function buildCricketCard(match, large) {
     }
   }
 
-  card.innerHTML = `<div class="inner">
+  return `
     <div class="cc-header">
       <div class="cc-live"><span class="live-dot"></span><span class="live-text">LIVE</span></div>
     </div>
@@ -518,87 +514,56 @@ function buildCricketCard(match, large) {
         <div class="cc-score-right">${scoreHTML(s2)}</div>
       </div>
     </div>
-    ${target ? `<div class="cc-target-bar">${target}</div>` : ''}
-  </div>`;
+    ${target ? `<div class="cc-target-bar">${target}</div>` : ''}`;
+}
 
+function buildCricketCard(match, large) {
+  const card = document.createElement('div');
+  card.className = `match-card focusable${large ? ' cricket-large' : ''}`;
+  card.tabIndex = 0;
+  card.innerHTML = `<div class="inner">${cricketCardInnerHTML(match)}</div>`;
   card.addEventListener('click', () => openCricketDetail(match));
   card.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openCricketDetail(match); } });
   return card;
 }
 
 function renderCricketDetailFull(full) {
-  const teams  = full.teams || [];
-  const t1name = teams[0] || '';
-  const t2name = teams[1] || '';
-  const info   = full.teamInfo || [];
-  const t1info = info.find(t => t.name === t1name) || {};
-  const t2info = info.find(t => t.name === t2name) || {};
-
-  const scores = full.score || [];
-  const s1 = scores.find(s => (s.inning || '').startsWith(t1name));
-  const s2 = scores.find(s => (s.inning || '').startsWith(t2name));
-
   const sc = full.scorecard || [];
   const currentInning = sc[sc.length - 1] || {};
   const batting  = currentInning.batting  || [];
   const bowling  = currentInning.bowling  || [];
-  const inningLabel = (currentInning.inning || '').replace(/\s+inning\s*\d*/i, '').trim();
-  const bowlingTeam = inningLabel === t1name ? t2name : t1name;
 
-  const currentBatsmen = batting.filter(b => b['dismissal-text'] === 'batting');
-  const topBowlers = bowling.slice().sort((a, b) => b.o - a.o).slice(0, 3);
-
-  const logoHTML = info => info.img
-    ? `<img class="cd-logo" src="${info.img}" alt="" onerror="this.style.display='none'">`
-    : `<div class="cd-logo cd-logo-badge">${(info.name||'?').substring(0,2).toUpperCase()}</div>`;
-
-  const scoreBlock = (s, align) => s
-    ? `<div class="cd-score-block ${align}"><div class="cd-runs">${s.r}/${s.w}</div><div class="cd-overs">${s.o} ov</div></div>`
-    : `<div class="cd-score-block ${align}"><div class="cd-yet">Yet to bat</div></div>`;
+  const currentBatsmen = batting.filter(b => b['dismissal-text'] === 'batting').slice(0, 2);
+  const recentBowlers  = bowling.slice().sort((a, b) => b.o - a.o).slice(0, 2);
 
   const battingRows = currentBatsmen.map(b =>
-    `<div class="cd-row"><div class="cd-pname">● ${b.batsman.name}</div><div class="cd-pstat">${b.r} <span class="cd-pball">(${b.b})</span></div></div>`
+    `<div class="cd-stat-row">
+      <div class="cd-pname">● ${b.batsman.name}</div>
+      <div class="cd-pstat">${b.r} <span class="cd-pball">(${b.b})</span></div>
+    </div>`
   ).join('');
 
-  const bowlingRows = topBowlers.map(b =>
-    `<div class="cd-row"><div class="cd-pname">${b.bowler.name}</div><div class="cd-pstat">${b.o}-${b.m}-${b.r}-${b.w}</div></div>`
+  const bowlingRows = recentBowlers.map(b =>
+    `<div class="cd-stat-row">
+      <div class="cd-pname">${b.bowler.name}</div>
+      <div class="cd-pstat">${b.o}-${b.m}-${b.r}-${b.w}</div>
+    </div>`
   ).join('');
 
   const venue = full.venue || '';
-  const status = full.status || '';
 
   document.getElementById('match-detail-content').innerHTML = `
     <div class="cd-wrap">
-      <div class="cd-teams-row">
-        <div class="cd-team-col">
-          ${logoHTML(t1info)}
-          <div class="cd-short">${t1info.shortname || t1name.substring(0,3).toUpperCase()}</div>
-        </div>
-        <div class="cd-vs">vs</div>
-        <div class="cd-team-col right">
-          <div class="cd-short">${t2info.shortname || t2name.substring(0,3).toUpperCase()}</div>
-          ${logoHTML(t2info)}
-        </div>
+      <div class="match-card">
+        <div class="inner">${cricketCardInnerHTML(full)}</div>
       </div>
-
-      <div class="cd-scores-row">
-        ${scoreBlock(s1, '')}
-        ${scoreBlock(s2, 'right')}
-      </div>
-
-      ${status ? `<div class="cd-status">${status}</div>` : ''}
-
-      ${battingRows ? `
-        <div class="cd-divider"></div>
-        <div class="cd-section-title">${inningLabel} BATTING</div>
-        ${battingRows}` : ''}
-
-      ${bowlingRows ? `
-        <div class="cd-divider"></div>
-        <div class="cd-section-title">${bowlingTeam} BOWLING</div>
-        ${bowlingRows}` : ''}
-
-      ${venue ? `<div class="cd-divider"></div><div class="cd-venue">📍 ${venue}</div>` : ''}
+      ${battingRows || bowlingRows ? `
+      <div class="cd-stats-row">
+        <div class="cd-stats-col">${battingRows}</div>
+        <div class="cd-stats-divider"></div>
+        <div class="cd-stats-col">${bowlingRows}</div>
+      </div>` : ''}
+      ${venue ? `<div class="cd-venue">📍 ${venue}</div>` : ''}
     </div>`;
 }
 
