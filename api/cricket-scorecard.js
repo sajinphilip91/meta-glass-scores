@@ -10,6 +10,7 @@ export default async function handler(req, res) {
       `https://api.cricapi.com/v1/match_scorecard?apikey=${key}&id=${id}`
     );
     const data = await r.json();
+    delete data.apikey;
     res.setHeader('Cache-Control', 's-maxage=60, stale-while-revalidate=30');
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.json(data);
