@@ -592,6 +592,122 @@ document.getElementById('btn-football').addEventListener('click', () => selectSp
 document.getElementById('btn-cricket').addEventListener('click', () => selectSport('cricket'));
 document.getElementById('btn-back-detail').addEventListener('click', goBack);
 
+// ── Voice Control ──────────────────────────────────────────────
+(function initVoice() {
+  const SR   = window.SpeechRecognition || window.webkitSpeechRecognition;
+  const bar  = document.getElementById('voice-bar');
+  const icon = document.getElementById('voice-icon');
+  const hint = document.getElementById('voice-hint');
+
+  if (!SR) { bar.style.display = 'none'; return; }
+
+  const HINTS = [
+    'Say "next" or "open"',
+    'Say "football" or "cricket"',
+    'Say "go back" to return',
+  ];
+  let hi = 0, hintTimer = null, feedbackTimer = null;
+
+  function cycleHint() {
+    hint.textContent = HINTS[hi++ % HINTS.length];
+    hint.classList.remove('voice-command');
+  }
+
+  function showFeedback(text) {
+    clearTimeout(feedbackTimer);
+    clearInterval(hintTimer);
+    hint.textContent = text;
+    hint.classList.add('voice-command');
+    feedbackTimer = setTimeout(() => {
+      hint.classList.remove('voice-command');
+      cycleHint();
+      hintTimer = setInterval(cycleHint, 4000);
+    }, 1500);
+  }
+
+  const sr = new SR();
+  sr.continuous = true;
+  sr.interimResults = false;
+  sr.lang = 'en-US';
+  let running = false;
+
+  function start() {
+    if (running) return;
+    try { sr.start(); running = true; } catch {}
+  }
+
+  sr.onstart = () => {
+    running = true;
+    icon.classList.add('listening');
+    bar.classList.add('active-listen');
+    cycleHint();
+    hintTimer = setInterval(cycleHint, 4000);
+  };
+
+  sr.onend = () => {
+    running = false;
+    icon.classList.remove('listening');
+    bar.classList.remove('active-listen');
+    clearInterval(hintTimer);
+    setTimeout(start, 1000);
+  };
+
+  sr.onerror = (e) => {
+    running = false;
+    if (e.error !== 'no-speech' && e.error !== 'aborted') {
+      icon.classList.remove('listening');
+      bar.classList.remove('active-listen');
+    }
+  };
+
+  sr.onresult = (event) => {
+    const last = event.results[event.results.length - 1];
+    if (!last.isFinal) return;
+    const cmd = last[0].transcript.trim().toLowerCase();
+
+    const scope = '#screen-' + state.currentScreen;
+    const focusables = Array.from(document.querySelectorAll(scope + ' .focusable'));
+    const idx = focusables.indexOf(document.activeElement);
+
+    if (cmd.includes('cricket')) {
+      showFeedback('✓ Cricket');
+      if (state.currentScreen !== 'home') goBack();
+      selectSport('cricket');
+    } else if (cmd.includes('football') || cmd.includes('soccer')) {
+      showFeedback('✓ Football');
+      if (state.currentScreen !== 'home') goBack();
+      selectSport('football');
+    } else if (cmd.includes('go back') || cmd === 'back') {
+      showFeedback('✓ Go back');
+      goBack();
+    } else if (cmd.includes('next') || cmd.includes('forward')) {
+      showFeedback('✓ Next');
+      const ni = Math.min(idx + 1, focusables.length - 1);
+      if (focusables[ni]) focusables[ni].focus();
+    } else if (cmd.includes('previous') || cmd.includes('prev')) {
+      showFeedback('✓ Previous');
+      const pi = Math.max(idx - 1, 0);
+      if (focusables[pi]) focusables[pi].focus();
+    } else if (cmd.includes('open') || cmd.includes('select') || cmd.includes('detail') || cmd.includes('show')) {
+      showFeedback('✓ Open');
+      if (document.activeElement && document.activeElement !== document.body) {
+        document.activeElement.click();
+      }
+    } else if (cmd.includes('scroll up')) {
+      showFeedback('✓ Scroll up');
+      const list = document.querySelector(scope + ' .match-list');
+      if (list) list.scrollBy({ top: -180, behavior: 'smooth' });
+    } else if (cmd.includes('scroll') || cmd.includes('more')) {
+      showFeedback('✓ Scroll down');
+      const list = document.querySelector(scope + ' .match-list');
+      if (list) list.scrollBy({ top: 180, behavior: 'smooth' });
+    }
+  };
+
+  bar.addEventListener('click', start);
+  start();
+})();
+
 // ── Boot ───────────────────────────────────────────────────────
 showScreen('home');
 selectSport(state.defaultSport || 'football');
