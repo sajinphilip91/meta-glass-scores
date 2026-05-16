@@ -254,6 +254,10 @@ async function loadCricket() {
   el.innerHTML = '<div class="loading">Loading…</div>';
   try {
     const res = await fetch('/api/cricket');
+    if (res.status === 429) {
+      el.innerHTML = '<div class="no-matches"><div class="no-matches-icon">🏏</div><div class="no-matches-title">API Limit Reached</div><div class="no-matches-sub">Daily quota exceeded. Resets at midnight UTC.</div></div>';
+      return;
+    }
     if (!res.ok) throw new Error(res.status);
     const data = await res.json();
     renderCricket(data.data || []);

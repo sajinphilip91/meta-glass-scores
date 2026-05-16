@@ -11,7 +11,10 @@ export default async function handler(req, res) {
     );
     const data = await r.json();
     delete data.apikey;
-    res.setHeader('Cache-Control', 's-maxage=60, stale-while-revalidate=30');
+    if (data.status === 'failure') {
+      return res.status(429).json({ error: data.reason || 'API limit reached' });
+    }
+    res.setHeader('Cache-Control', 's-maxage=300, stale-while-revalidate=60');
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.json(data);
   } catch {

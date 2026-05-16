@@ -468,7 +468,7 @@ html, body {
 .cc-header {
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: center;
   margin-bottom: 10px;
 }
 .cc-live { display: flex; align-items: center; gap: 6px; }
