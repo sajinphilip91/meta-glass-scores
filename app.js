@@ -295,6 +295,10 @@ const DUMMY_CRICKET_MATCHES = [
     matchStarted: true,
     matchEnded: false,
     teams: ['Mumbai Indians', 'Chennai Super Kings'],
+    teamInfo: [
+      { name: 'Mumbai Indians', shortname: 'MI', img: '' },
+      { name: 'Chennai Super Kings', shortname: 'CSK', img: '' },
+    ],
     score: [
       { inning: 'Mumbai Indians Inning 1', r: 186, w: 5, o: 20 },
       { inning: 'Chennai Super Kings Inning 1', r: 142, w: 7, o: 17.3 },
@@ -306,6 +310,10 @@ const DUMMY_CRICKET_MATCHES = [
     matchStarted: true,
     matchEnded: false,
     teams: ['India', 'Australia'],
+    teamInfo: [
+      { name: 'India', shortname: 'IND', img: '' },
+      { name: 'Australia', shortname: 'AUS', img: '' },
+    ],
     score: [
       { inning: 'India Inning 1', r: 204, w: 4, o: 20 },
       { inning: 'Australia Inning 1', r: 97, w: 3, o: 11.2 },
@@ -399,51 +407,86 @@ function getTeamOvers(scores, teamName) {
   return last.o != null ? String(last.o) : null;
 }
 
+function ordinalOver(overs) {
+  if (overs == null) return null;
+  const n = Math.ceil(parseFloat(overs));
+  if (!n) return null;
+  const suffix = (n % 100 >= 11 && n % 100 <= 13) ? 'th'
+    : n % 10 === 1 ? 'st' : n % 10 === 2 ? 'nd' : n % 10 === 3 ? 'rd' : 'th';
+  return `${n}${suffix} OVER`;
+}
+
 function buildCricketCard(match, large) {
   const card = document.createElement('div');
   card.className = `match-card focusable${large ? ' cricket-large' : ''}`;
   card.tabIndex = 0;
 
-  const teams = match.teams || [];
+  const teams    = match.teams    || [];
+  const teamInfo = match.teamInfo || [];
   const t1 = teams[0] || '';
   const t2 = teams[1] || '';
+
+  const info1 = teamInfo.find(t => t.name === t1) || {};
+  const info2 = teamInfo.find(t => t.name === t2) || {};
+  const short1 = info1.shortname || IPL_TEAMS[t1.toLowerCase()]?.abbr || t1.substring(0, 3).toUpperCase();
+  const short2 = info2.shortname || IPL_TEAMS[t2.toLowerCase()]?.abbr || t2.substring(0, 3).toUpperCase();
+
   const scores = match.score || [];
-  const s1 = getTeamScore(scores, t1);
-  const s2 = getTeamScore(scores, t2);
-  const ov1 = getTeamOvers(scores, t1);
-  const ov2 = getTeamOvers(scores, t2);
-  const sz = large ? 'crest-lg' : 'crest-md';
+  const s1 = scores.find(s => (s.inning || '').toLowerCase().startsWith(t1.toLowerCase()));
+  const s2 = scores.find(s => (s.inning || '').toLowerCase().startsWith(t2.toLowerCase()));
+
+  const logoHTML = (info, teamName) => {
+    if (info.img) return `<img class="cc-logo" src="${info.img}" alt="" onerror="this.style.display='none'">`;
+    const key = teamName.toLowerCase();
+    const ipl = IPL_TEAMS[key];
+    if (ipl) return `<div class="cc-logo cc-badge" style="background:${ipl.bg};color:${ipl.color}">${ipl.abbr}</div>`;
+    const flagCode = COUNTRY_FLAGS[key];
+    if (flagCode) return `<img class="cc-logo cc-flag" src="https://flagcdn.com/w80/${flagCode}.png" alt="" onerror="this.style.display='none'">`;
+    return `<div class="cc-logo cc-badge" style="background:#2a2a2a;color:#aaa">${teamName.substring(0, 2).toUpperCase()}</div>`;
+  };
+
+  const scoreHTML = s => s
+    ? `<div class="cc-runs">${s.r}/${s.w}</div><div class="cc-label">${s.o} OVERS</div>`
+    : `<div class="cc-dashes">— — —</div><div class="cc-label">YET TO BAT</div>`;
+
+  const battingScore = s1 && !s2 ? s1 : s2 || s1;
+  const currentOver = battingScore ? ordinalOver(battingScore.o) : null;
+
+  let target = null;
+  if (s1 && !s2) {
+    target = `${short2} need ${s1.r + 1} to win`;
+  } else if (s1 && s2) {
+    const needed = s1.r - s2.r + 1;
+    if (needed > 0) target = `${short2} need ${needed} more to win`;
+  }
 
   card.innerHTML = `<div class="inner">
-    <div class="live-bar">
-      <span class="live-dot"></span>
-      <span class="live-text">LIVE</span>
+    <div class="cc-header">
+      <div class="cc-live"><span class="live-dot"></span><span class="live-text">LIVE</span></div>
+      ${currentOver ? `<div class="cc-over-pill">${currentOver}</div>` : ''}
     </div>
-    <div class="card-teams">
-      <div class="card-team">
-        <div class="cricket-team-top">
-          ${getCricketTeamVisual(t1, sz)}
-          <div class="cricket-score-block">
-            <div class="cricket-card-score">${s1 || '–'}</div>
-            ${ov1 ? `<div class="cricket-card-overs">${ov1} ov</div>` : ''}
-          </div>
+    <div class="cc-teams-row">
+      <div class="cc-team-left">
+        ${logoHTML(info1, t1)}
+        <div class="cc-team-text">
+          <div class="cc-abbr">${short1}</div>
+          <div class="cc-fullname">${t1}</div>
         </div>
-        <div class="card-team-name">${t1}</div>
       </div>
-      <div class="card-center cricket-center">
-        <div class="cricket-vs">vs</div>
-      </div>
-      <div class="card-team">
-        <div class="cricket-team-top">
-          <div class="cricket-score-block">
-            <div class="cricket-card-score">${s2 || '–'}</div>
-            ${ov2 ? `<div class="cricket-card-overs">${ov2} ov</div>` : ''}
-          </div>
-          ${getCricketTeamVisual(t2, sz)}
+      <div class="cc-vs-circle">VS</div>
+      <div class="cc-team-right">
+        <div class="cc-team-text right">
+          <div class="cc-abbr">${short2}</div>
+          <div class="cc-fullname">${t2}</div>
         </div>
-        <div class="card-team-name">${t2}</div>
+        ${logoHTML(info2, t2)}
       </div>
     </div>
+    <div class="cc-scores-row">
+      <div class="cc-score-left">${scoreHTML(s1)}</div>
+      <div class="cc-score-right">${scoreHTML(s2)}</div>
+    </div>
+    ${target ? `<div class="cc-target-bar">🎯 ${target}</div>` : ''}
   </div>`;
 
   card.addEventListener('click', () => openCricketDetail(match));

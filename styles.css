@@ -464,7 +464,73 @@ html, body {
 
 .cd-venue { font-size: 10px; color: #6b7280; text-align: center; line-height: 1.5; }
 
-/* ── Cricket card ── */
+/* ── Cricket card redesign ── */
+.cc-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+.cc-live { display: flex; align-items: center; gap: 6px; }
+.cc-over-pill { font-size: 10px; font-weight: 700; color: #9ca3af; letter-spacing: 1px; text-transform: uppercase; }
+
+.cc-teams-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+.cc-team-left  { display: flex; align-items: center; gap: 10px; }
+.cc-team-right { display: flex; align-items: center; gap: 10px; flex-direction: row-reverse; }
+
+.cc-logo {
+  width: 44px; height: 44px;
+  border-radius: 50%;
+  object-fit: cover;
+  flex-shrink: 0;
+}
+.cc-badge { display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 13px; font-family: inherit; }
+.cc-flag  { object-fit: cover; }
+
+.cc-team-text { display: flex; flex-direction: column; gap: 2px; }
+.cc-team-text.right { align-items: flex-end; }
+.cc-abbr     { font-size: 20px; font-weight: 800; color: #fff; letter-spacing: 0.5px; line-height: 1; }
+.cc-fullname { font-size: 10px; color: #6b7280; letter-spacing: 0.3px; }
+
+.cc-vs-circle {
+  width: 30px; height: 30px;
+  border-radius: 50%;
+  border: 1px solid rgba(255,255,255,0.15);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 8px; font-weight: 700; color: #6b7280; letter-spacing: 1px;
+  flex-shrink: 0;
+}
+
+.cc-scores-row { display: flex; justify-content: space-between; margin-bottom: 8px; }
+.cc-score-left  { display: flex; flex-direction: column; }
+.cc-score-right { display: flex; flex-direction: column; align-items: flex-end; }
+
+.cc-runs  { font-size: 28px; font-weight: 700; color: #4a9eff; letter-spacing: -1px; line-height: 1; }
+.cc-dashes{ font-size: 16px; color: #374151; letter-spacing: 5px; line-height: 1; padding-top: 5px; }
+.cc-label { font-size: 9px; color: #6b7280; letter-spacing: 1.5px; margin-top: 3px; text-transform: uppercase; }
+
+.cricket-large .cc-runs  { font-size: 36px; }
+.cricket-large .cc-logo  { width: 52px; height: 52px; }
+.cricket-large .cc-abbr  { font-size: 24px; }
+
+.cc-target-bar {
+  background: rgba(74, 158, 255, 0.08);
+  border: 1px solid rgba(74, 158, 255, 0.2);
+  border-radius: 8px;
+  padding: 6px 12px;
+  font-size: 11px;
+  font-weight: 600;
+  color: #4a9eff;
+  text-align: center;
+  letter-spacing: 0.3px;
+}
+
+/* ── Cricket card (legacy classes kept for detail screen) ── */
 .cricket-badge {
   border-radius: 10px;
   display: flex;
