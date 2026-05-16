@@ -474,19 +474,28 @@ html, body {
 .cc-live { display: flex; align-items: center; gap: 6px; }
 .cc-over-pill { font-size: 10px; font-weight: 700; color: #9ca3af; letter-spacing: 1px; text-transform: uppercase; }
 
-.cc-body {
+.cc-main {
   display: flex;
   align-items: center;
-  justify-content: space-between;
   margin-bottom: 8px;
 }
-.cc-team-col {
+.cc-left-col {
+  flex: 1;
   display: flex;
   flex-direction: column;
-  align-items: center;
-  gap: 6px;
-  flex: 1;
+  gap: 8px;
 }
+.cc-right-col {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 8px;
+}
+.cc-team-left  { display: flex; align-items: center; gap: 10px; }
+.cc-team-right { display: flex; align-items: center; gap: 10px; }
+.cc-score-left  { display: flex; flex-direction: column; }
+.cc-score-right { display: flex; flex-direction: column; align-items: flex-end; }
 
 .cc-logo {
   width: 44px; height: 30px;

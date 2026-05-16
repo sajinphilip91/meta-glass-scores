@@ -479,17 +479,15 @@ function buildCricketCard(match, large) {
     <div class="cc-header">
       <div class="cc-live"><span class="live-dot"></span><span class="live-text">LIVE</span></div>
     </div>
-    <div class="cc-body">
-      <div class="cc-team-col">
-        ${logoHTML(t1)}
-        <div class="cc-abbr">${short1}</div>
-        ${scoreHTML(s1)}
+    <div class="cc-main">
+      <div class="cc-left-col">
+        <div class="cc-team-left">${logoHTML(t1)}<div class="cc-abbr">${short1}</div></div>
+        <div class="cc-score-left">${scoreHTML(s1)}</div>
       </div>
       <div class="cc-vs-circle">VS</div>
-      <div class="cc-team-col">
-        ${logoHTML(t2)}
-        <div class="cc-abbr">${short2}</div>
-        ${scoreHTML(s2)}
+      <div class="cc-right-col">
+        <div class="cc-team-right"><div class="cc-abbr">${short2}</div>${logoHTML(t2)}</div>
+        <div class="cc-score-right">${scoreHTML(s2)}</div>
       </div>
     </div>
     ${target ? `<div class="cc-target-bar">${target}</div>` : ''}
